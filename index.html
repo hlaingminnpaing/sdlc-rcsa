@@ -146,10 +146,24 @@ select.ef-NotTested{background:#FFFFFF;color:#2F4DC4;border-color:var(--line)}
 /* matrix */
 .mtx{font-size:11px}.mtx th,.mtx td{padding:5px 6px;text-align:center;border:1px solid var(--line)}
 .mtx th.grp{font-family:"Space Grotesk";background:var(--surface-2);letter-spacing:.06em}
-.mtx td.x{background:var(--brand-soft);color:var(--brand);font-weight:700}
+.mtx th.grp-Build{background:#2E7D32;color:#fff;border-color:rgba(255,255,255,.3)}
+.mtx th.grp-Release{background:#2E5B9E;color:#fff;border-color:rgba(255,255,255,.3)}
+.mtx th.grp-Runtime{background:#8C5A2B;color:#fff;border-color:rgba(255,255,255,.3)}
+.mtx th.grp-Lifecycle{background:#6A4A9C;color:#fff;border-color:rgba(255,255,255,.3)}
+.mtx th.rhead{background:#2F5597;color:#fff;font-family:"Space Grotesk"}
 .mtx td.risklbl{text-align:left;white-space:nowrap}
+.mtx td.rname-cell{text-align:left;white-space:normal;max-width:170px;color:var(--ink)}
 .mtx .cid{writing-mode:vertical-rl;transform:rotate(180deg);font-family:"JetBrains Mono";font-size:10px}
-.mtx tr:hover td{background:#F2F5FE}
+.mtx tbody tr:hover td.risklbl,.mtx tbody tr:hover td.rname-cell{background:#F2F5FE}
+/* X cell colour = mitigating control's live effectiveness */
+.mtx td.x-Effective{background:#C6EFCE;color:#0A6B2D;font-weight:700}
+.mtx td.x-PartiallyEffective{background:#FFF2CC;color:#9A6700;font-weight:700}
+.mtx td.x-Ineffective{background:#FFC7CE;color:#9C0006;font-weight:700}
+.mtx td.x-NotTested{background:#fff;color:#2F4DC4;font-weight:700}
+.mtx tr.sumrow td{background:var(--surface-2);font-weight:600}
+.mtx td.sumlbl{text-align:right;font-family:"Space Grotesk";text-transform:uppercase;letter-spacing:.04em;
+  font-size:9.5px;color:var(--muted);background:var(--surface-2);font-weight:600}
+.mtx td.effmini{font-size:9px;font-family:"JetBrains Mono";font-weight:700}
 
 /* legend / methodology */
 .prose{padding:18px 20px;max-width:760px}
@@ -397,25 +411,37 @@ function renderRisks(){
 function setRisk(ix,k,v){DATA.risks[ix][k]=v;save();renderRisks();renderDash();}
 
 /* ---------- MATRIX ---------- */
+function effAbbr(e){return {"Effective":"Eff","Partially Effective":"Part","Ineffective":"Inef","Not Tested":"NT"}[e]||e;}
 function renderMatrix(){
   const ordered=[];GROUPS.forEach(g=>DATA.controls.filter(c=>c.group===g).forEach(c=>ordered.push(c)));
-  const grpHead=GROUPS.map(g=>`<th class="grp" colspan="${DATA.controls.filter(c=>c.group===g).length}">${g}</th>`).join("");
+  const grpHead=GROUPS.map(g=>{const n=DATA.controls.filter(c=>c.group===g).length;
+    return n?`<th class="grp grp-${g}" colspan="${n}">${g.toUpperCase()}</th>`:"";}).join("");
   const cidHead=ordered.map(c=>`<th><div class="cid">${c.id}</div></th>`).join("");
   const body=DATA.risks.map(r=>{
-    const tds=ordered.map(c=>r.ctrls.includes(c.id)?`<td class="x">X</td>`:`<td></td>`).join("");
-    return `<tr><td class="risklbl"><span class="rid">${r.id}</span></td>${tds}<td class="numcell">${r.ctrls.length}</td></tr>`;
+    const tds=ordered.map(c=>r.ctrls.includes(c.id)
+      ?`<td class="x-${clsName(c.eff)}" title="CTRL-${c.id} · ${esc(c.eff)}">X</td>`
+      :`<td></td>`).join("");
+    return `<tr><td class="risklbl"><span class="rid">${r.id}</span></td><td class="rname-cell">${esc(r.name)}</td>${tds}<td class="numcell">${r.ctrls.length}</td></tr>`;
   }).join("");
-  const totals=ordered.map(c=>`<td class="numcell">${risksForControl(c.id).length}</td>`).join("");
+  const counts=ordered.map(c=>`<td class="numcell">${risksForControl(c.id).length}</td>`).join("");
+  const effs=ordered.map(c=>`<td class="x-${clsName(c.eff)} effmini" title="CTRL-${c.id} · ${esc(c.eff)}">${effAbbr(c.eff)}</td>`).join("");
+  const weights=ordered.map(c=>`<td class="numcell">${(EFF_WEIGHT[c.eff]??0).toFixed(1)}</td>`).join("");
+  const totalCtrls=DATA.risks.reduce((s,r)=>s+r.ctrls.length,0);
   $("#v-matrix").innerHTML=`<div class="card">
     <div class="card-h"><span class="section-eyebrow">Mapping</span><h2>Risk–Control Matrix</h2>
-      <span class="note">X = control mitigates the risk</span></div>
+      <span class="note">X = control mitigates a risk — cell colour reflects the control's live effectiveness</span></div>
     <div class="tbl-scroll" style="padding:14px">
       <table class="mtx">
         <thead>
-          <tr><th></th>${grpHead}<th></th></tr>
-          <tr><th>Risk</th>${cidHead}<th># ctrls</th></tr>
+          <tr><th class="rhead"></th><th class="rhead"></th>${grpHead}<th class="rhead"></th></tr>
+          <tr><th class="rhead">Risk ID</th><th class="rhead">Risk</th>${cidHead}<th class="rhead"># Ctrls</th></tr>
         </thead>
-        <tbody>${body}<tr><td class="risklbl"><b># risks</b></td>${totals}<td></td></tr></tbody>
+        <tbody>
+          ${body}
+          <tr class="sumrow"><td class="sumlbl" colspan="2"># Risks (per control)</td>${counts}<td class="numcell">${totalCtrls}</td></tr>
+          <tr class="effrow"><td class="sumlbl" colspan="2">Control Effectiveness (live)</td>${effs}<td></td></tr>
+          <tr class="sumrow"><td class="sumlbl" colspan="2">Effectiveness weight</td>${weights}<td></td></tr>
+        </tbody>
       </table>
     </div></div>`;
 }
