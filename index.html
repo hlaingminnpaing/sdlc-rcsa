@@ -167,7 +167,13 @@ select.ef-NotTested{background:#FFFFFF;color:#2F4DC4;border-color:var(--line)}
 .effgrp .col h4{font-size:11px;margin:0 0 7px;font-family:"Space Grotesk";display:flex;align-items:center;gap:6px}
 .effgrp .col .cnt{color:var(--faint);font-weight:500}
 .effgrp .chips{display:flex;flex-wrap:wrap;gap:4px}
-.effgrp .chip{font-family:"JetBrains Mono";font-size:10px;padding:2px 6px;border-radius:5px;border:1px solid var(--line)}
+.effgrp .chip{font-family:"JetBrains Mono";font-size:10px;padding:2px 6px;border-radius:5px;border:1px solid var(--line);
+  cursor:pointer;transition:filter .12s,box-shadow .12s,transform .12s;outline:none}
+.effgrp .chip:hover{filter:brightness(.96);box-shadow:0 1px 4px rgba(16,32,46,.18);transform:translateY(-1px)}
+.effgrp .chip:focus-visible{box-shadow:0 0 0 3px var(--brand-soft)}
+/* highlight a control row when navigated to from the Dashboard */
+@keyframes rowflash{0%,40%{background:var(--brand-soft)}100%{background:transparent}}
+.ctrl-tbl tr.row-flash td{animation:rowflash 1.8s ease}
 .effgrp .chip.Effective{background:#C6EFCE;color:#0A6B2D;border-color:#9BD9AD}
 .effgrp .chip.PartiallyEffective{background:#FFF2CC;color:#9A6700;border-color:#F2D98A}
 .effgrp .chip.Ineffective{background:#FFC7CE;color:#9C0006;border-color:#F3A9B1}
@@ -368,7 +374,6 @@ function renderDash(){
   const stat=(k,v,sub)=>`<div class="stat"><div class="k">${k}</div><div class="v">${v}${sub?` <small>${sub}</small>`:""}</div></div>`;
   const implPct=Math.round(ci("Implemented")/DATA.controls.length*100);
   const cg=g=>DATA.controls.filter(c=>c.group===g).length;
-  const ctrlsByEff=e=>DATA.controls.filter(c=>c.eff===e).map(c=>"CTRL-"+c.id);
 
   // reusable "label | count" table card
   const tbl=(eyebrow,title,headerLabel,rowsArr)=>`<div class="card">
@@ -379,11 +384,14 @@ function renderDash(){
     </table></div></div>`;
 
   const effGroupCard=`<div class="card">
-    <div class="card-h"><span class="section-eyebrow">Live</span><h2>Controls by Effectiveness</h2></div>
+    <div class="card-h"><span class="section-eyebrow">Live</span><h2>Controls by Effectiveness</h2>
+      <span class="note">Click a control ID to open it in the Controls tab</span></div>
     <div class="effgrp">
-      ${EFFS.map(e=>{const ids=ctrlsByEff(e);return `<div class="col">
-        <h4>${effDot(e)}${e} <span class="cnt">· ${ids.length}</span></h4>
-        <div class="chips">${ids.length?ids.map(id=>`<span class="chip ${clsName(e)}">${id}</span>`).join(""):`<span class="none">—</span>`}</div>
+      ${EFFS.map(e=>{const cs=DATA.controls.filter(c=>c.eff===e);return `<div class="col">
+        <h4>${effDot(e)}${e} <span class="cnt">· ${cs.length}</span></h4>
+        <div class="chips">${cs.length?cs.map(c=>`<span class="chip ${clsName(e)}" role="button" tabindex="0"
+          onclick="gotoCtrl('${c.id}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();gotoCtrl('${c.id}')}"
+          title="Open CTRL-${c.id} — ${esc(c.name)} in the Controls tab">CTRL-${c.id}</span>`).join(""):`<span class="none">—</span>`}</div>
       </div>`;}).join("")}
     </div></div>`;
 
@@ -531,7 +539,7 @@ function renderControls(){
     list.forEach(c=>{
       const ix=DATA.controls.indexOf(c);
       const mit=risksForControl(c.id);
-      rows+=`<tr>
+      rows+=`<tr id="ctrl-${c.id}">
         <td><span class="rid">CTRL-${c.id}</span></td>
         <td><div class="rname">${esc(c.name)}</div></td>
         <td class="obj">${esc(c.obj)}</td>
@@ -621,6 +629,16 @@ function renderTabs(active){
   TABS.forEach(([id])=>$("#v-"+id).classList.toggle("active",id===active));
 }
 function go(id){renderTabs(id);location.hash=id;}
+/* jump from a Dashboard control chip to that control's row in the Controls tab */
+function gotoCtrl(id){
+  go("controls"); // controls view is already rendered in the DOM, just made visible here
+  const row=document.getElementById("ctrl-"+id);
+  if(!row)return;
+  row.classList.remove("row-flash");void row.offsetWidth; // restart animation if re-clicked
+  row.classList.add("row-flash");
+  row.scrollIntoView({behavior:"smooth",block:"center"});
+  setTimeout(()=>row.classList.remove("row-flash"),1800);
+}
 function save(){store(DATA);}
 
 function renderAll(){renderMeta();renderDash();renderRisks();renderMatrix();renderControls();renderLegend();}
