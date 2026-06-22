@@ -160,6 +160,20 @@ select.ef-NotTested{background:#FFFFFF;color:#2F4DC4;border-color:var(--line)}
 .rr-tbl input.dt{min-width:124px}
 .rr-tbl select.blue-sel{color:var(--brand);font-weight:600}
 
+/* Dashboard — Excel "RCSA Summary Dashboard" breakdown tables */
+.dash-tables{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:18px}
+@media(max-width:880px){.dash-tables{grid-template-columns:1fr}}
+.effgrp{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:16px}
+.effgrp .col h4{font-size:11px;margin:0 0 7px;font-family:"Space Grotesk";display:flex;align-items:center;gap:6px}
+.effgrp .col .cnt{color:var(--faint);font-weight:500}
+.effgrp .chips{display:flex;flex-wrap:wrap;gap:4px}
+.effgrp .chip{font-family:"JetBrains Mono";font-size:10px;padding:2px 6px;border-radius:5px;border:1px solid var(--line)}
+.effgrp .chip.Effective{background:#C6EFCE;color:#0A6B2D;border-color:#9BD9AD}
+.effgrp .chip.PartiallyEffective{background:#FFF2CC;color:#9A6700;border-color:#F2D98A}
+.effgrp .chip.Ineffective{background:#FFC7CE;color:#9C0006;border-color:#F3A9B1}
+.effgrp .chip.NotTested{background:#fff;color:#2F4DC4}
+.effgrp .col .none{color:var(--faint);font-size:11px}
+
 /* matrix */
 .mtx{font-size:11px}.mtx th,.mtx td{padding:5px 6px;text-align:center;border:1px solid var(--line)}
 .mtx th.grp{font-family:"Space Grotesk";background:var(--surface-2);letter-spacing:.06em}
@@ -353,6 +367,25 @@ function renderDash(){
 
   const stat=(k,v,sub)=>`<div class="stat"><div class="k">${k}</div><div class="v">${v}${sub?` <small>${sub}</small>`:""}</div></div>`;
   const implPct=Math.round(ci("Implemented")/DATA.controls.length*100);
+  const cg=g=>DATA.controls.filter(c=>c.group===g).length;
+  const ctrlsByEff=e=>DATA.controls.filter(c=>c.eff===e).map(c=>"CTRL-"+c.id);
+
+  // reusable "label | count" table card
+  const tbl=(eyebrow,title,headerLabel,rowsArr)=>`<div class="card">
+    <div class="card-h"><span class="section-eyebrow">${eyebrow}</span><h2>${title}</h2></div>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>${headerLabel}</th><th class="numcell">Count</th></tr></thead>
+      <tbody>${rowsArr.map(([l,c])=>`<tr><td>${l}</td><td class="numcell">${c}</td></tr>`).join("")}</tbody>
+    </table></div></div>`;
+
+  const effGroupCard=`<div class="card">
+    <div class="card-h"><span class="section-eyebrow">Live</span><h2>Controls by Effectiveness</h2></div>
+    <div class="effgrp">
+      ${EFFS.map(e=>{const ids=ctrlsByEff(e);return `<div class="col">
+        <h4>${effDot(e)}${e} <span class="cnt">· ${ids.length}</span></h4>
+        <div class="chips">${ids.length?ids.map(id=>`<span class="chip ${clsName(e)}">${id}</span>`).join(""):`<span class="none">—</span>`}</div>
+      </div>`;}).join("")}
+    </div></div>`;
 
   $("#v-dash").innerHTML=`
     <div class="dash-grid">
@@ -371,26 +404,24 @@ function renderDash(){
         </div>
       </div>
       <div class="card">
-        <div class="card-h"><span class="section-eyebrow">Posture</span><h2>Rating &amp; Status Breakdown</h2></div>
+        <div class="card-h"><span class="section-eyebrow">Posture</span><h2>Risk by Rating</h2></div>
         <div class="tbl-scroll">
           <table>
-            <thead><tr><th>Residual rating</th><th class="numcell">Count</th><th>Inherent rating</th><th class="numcell">Count</th></tr></thead>
+            <thead><tr><th>Residual risk by rating</th><th class="numcell">Count</th><th>Inherent risk by rating</th><th class="numcell">Count</th></tr></thead>
             <tbody>
               ${["Critical","High","Medium","Low"].map(r=>`<tr>
                 <td>${ratingPill(r)}</td><td class="numcell">${cnt(r)}</td>
                 <td>${ratingPill(r)}</td><td class="numcell">${cntInh(r)}</td></tr>`).join("")}
             </tbody>
           </table>
-          <table style="margin-top:6px">
-            <thead><tr><th>Control effectiveness</th><th class="numcell">Count</th><th>Implementation</th><th class="numcell">Count</th></tr></thead>
-            <tbody>
-              ${EFFS.map((e,ix)=>`<tr>
-                <td>${effDot(e)}${e}</td><td class="numcell">${ce(e)}</td>
-                <td>${IMPLS[ix]}</td><td class="numcell">${ci(IMPLS[ix])}</td></tr>`).join("")}
-            </tbody>
-          </table>
         </div>
       </div>
+    </div>
+    <div class="dash-tables">
+      ${tbl("Controls","Control implementation status","Implementation",IMPLS.map(i=>[i,ci(i)]))}
+      ${tbl("Controls","Controls by group","Group",GROUPS.map(g=>[g+" Controls",cg(g)]))}
+      ${tbl("Controls","Control effectiveness","Effectiveness",EFFS.map(e=>[effDot(e)+e,ce(e)]))}
+      ${effGroupCard}
     </div>`;
 }
 
