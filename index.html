@@ -124,6 +124,25 @@ select.imp-Planned{background:#FFEB9C;color:#7A5C00;border-color:#EAD06A}
 select.imp-NotImplemented,select.ef-Ineffective{background:#FFC7CE;color:#9C0006;border-color:#F3A9B1}
 select.ef-NotTested{background:#FFFFFF;color:#2F4DC4;border-color:var(--line)}
 
+/* Controls tab — Excel "Build Controls" layout */
+.ctrl-tbl{font-size:12.5px}
+.ctrl-tbl th{position:static;text-transform:none;white-space:normal}
+.ctrl-tbl th.band{color:#fff;font-family:"Space Grotesk";font-size:11px;font-weight:600;letter-spacing:.08em;
+  text-align:center;border:1px solid rgba(255,255,255,.22);padding:7px 8px}
+.ctrl-tbl th.band-control{background:#595959}
+.ctrl-tbl th.band-risk{background:#9C7A1A}
+.ctrl-tbl th.band-assess{background:#2E5B9E}
+.ctrl-tbl th.band-owner{background:#5E3A87}
+.ctrl-tbl th.col{background:#2F5597;color:#fff;font-size:10px;letter-spacing:.02em;font-weight:600;
+  text-align:center;border:1px solid rgba(255,255,255,.18);padding:8px 9px;vertical-align:middle}
+.ctrl-tbl td{border:1px solid var(--line);vertical-align:middle}
+.ctrl-tbl .grp-row td{background:#1F5C2E;color:#fff;font-family:"Space Grotesk";font-weight:600;font-size:11px;
+  letter-spacing:.08em;text-transform:uppercase;border-color:#1F5C2E}
+.ctrl-tbl .obj{color:var(--muted);font-size:11.5px;max-width:240px;white-space:normal}
+.ctrl-tbl .riskcov{font-family:"JetBrains Mono";font-size:11px;text-align:center;color:var(--ink)}
+.ctrl-tbl input.dt{min-width:124px}
+.ctrl-tbl select.status-sel{color:var(--brand);font-weight:600;text-align:center;text-align-last:center;min-width:108px}
+
 /* matrix */
 .mtx{font-size:11px}.mtx th,.mtx td{padding:5px 6px;text-align:center;border:1px solid var(--line)}
 .mtx th.grp{font-family:"Space Grotesk";background:var(--surface-2);letter-spacing:.06em}
@@ -239,7 +258,9 @@ const EFF_WEIGHT={"Effective":1,"Partially Effective":0.5,"Ineffective":0,"Not T
 
 /* ---------- model + calc engine ---------- */
 let DATA=clone(load()||SEED);
+normalizeCtrls();
 function clone(o){return JSON.parse(JSON.stringify(o));}
+function normalizeCtrls(){DATA.controls.forEach(c=>{if(c.action==null)c.action="";if(c.target==null)c.target="";if(c.status==null)c.status="To Do";});}
 function ctrlById(id){return DATA.controls.find(c=>c.id===id);}
 function rnd(x){return Math.floor(Math.abs(x)+0.5)*Math.sign(x)||0;} // round half away from zero
 
@@ -404,31 +425,55 @@ function renderControls(){
   let rows="";
   GROUPS.forEach(g=>{
     const list=DATA.controls.filter(c=>c.group===g);
-    rows+=`<tr class="grp-row"><td colspan="8">${g} controls · ${list.length}</td></tr>`;
+    rows+=`<tr class="grp-row"><td colspan="14">${g} Controls — SDLC Controls · ${list.length}</td></tr>`;
     list.forEach(c=>{
       const ix=DATA.controls.indexOf(c);
+      const mit=risksForControl(c.id);
       rows+=`<tr>
         <td><span class="rid">CTRL-${c.id}</span></td>
-        <td><div class="rname">${esc(c.name)}</div><div class="rdesc">${esc(c.obj)}</div>
-            <div class="mono" style="font-size:10.5px;color:var(--faint);margin-top:4px">mitigates: ${risksForControl(c.id).join(", ")||"—"}</div></td>
-        <td><select class="ctype" onchange="setCtrl(${ix},'type',this.value)">${opt(CTRL_TYPES,c.type)}</select></td>
-        <td><select onchange="setCtrl(${ix},'nature',this.value)">${opt(CTRL_NATURES,c.nature)}</select></td>
-        <td><select class="assess imp-${clsName(c.impl)}" onchange="setCtrl(${ix},'impl',this.value)">${opt(IMPLS,c.impl)}</select></td>
-        <td><select class="assess ef-${clsName(c.eff)}" onchange="setCtrl(${ix},'eff',this.value)">${opt(EFFS,c.eff)}</select></td>
-        <td><input class="fld" value="${esc(c.owner)}" placeholder="owner" oninput="setCtrl(${ix},'owner',this.value)"></td>
-        <td><input class="fld" value="${esc(c.evidence)}" placeholder="evidence / link" oninput="setCtrl(${ix},'evidence',this.value)"></td>
+        <td><div class="rname">${esc(c.name)}</div></td>
+        <td class="obj">${esc(c.obj)}</td>
+        <td><select class="ctype" onchange="setCtrlField(${ix},'type',this.value)">${opt(CTRL_TYPES,c.type)}</select></td>
+        <td><select onchange="setCtrlField(${ix},'nature',this.value)">${opt(CTRL_NATURES,c.nature)}</select></td>
+        <td class="riskcov">${mit.join(", ")||"—"}</td>
+        <td class="numcell">${mit.length}</td>
+        <td><select class="assess imp-${clsName(c.impl)}" onchange="this.className='assess imp-'+clsName(this.value);setCalc(${ix},'impl',this.value)">${opt(IMPLS,c.impl)}</select></td>
+        <td><select class="assess ef-${clsName(c.eff)}" onchange="this.className='assess ef-'+clsName(this.value);setCalc(${ix},'eff',this.value)">${opt(EFFS,c.eff)}</select></td>
+        <td><input class="fld" value="${esc(c.owner)}" placeholder="owner" oninput="setCtrlField(${ix},'owner',this.value)"></td>
+        <td><input class="fld" value="${esc(c.evidence)}" placeholder="evidence / link" oninput="setCtrlField(${ix},'evidence',this.value)"></td>
+        <td><input class="fld" value="${esc(c.action)}" placeholder="action / notes" oninput="setCtrlField(${ix},'action',this.value)"></td>
+        <td><input class="fld dt" type="date" value="${esc(c.target)}" oninput="setCtrlField(${ix},'target',this.value)"></td>
+        <td><select class="status-sel" onchange="setCtrlField(${ix},'status',this.value)">${opt(STATUSES,c.status||'To Do')}</select></td>
       </tr>`;
     });
   });
   $("#v-controls").innerHTML=`<div class="card">
     <div class="card-h"><span class="section-eyebrow">Controls</span><h2>Control Assessment</h2>
       <span class="note">Effectiveness here drives every mapped risk's residual score</span></div>
-    <div class="tbl-scroll"><table>
-      <thead><tr><th>ID</th><th>Control</th><th>Control Type</th><th>Control Nature</th><th>Implementation</th><th>Effectiveness</th><th>Owner</th><th>Evidence</th></tr></thead>
+    <div class="tbl-scroll"><table class="ctrl-tbl">
+      <thead>
+        <tr>
+          <th class="band band-control" colspan="5">CONTROL</th>
+          <th class="band band-risk" colspan="2">RISK COVERAGE</th>
+          <th class="band band-assess" colspan="2">ASSESSMENT</th>
+          <th class="band band-owner" colspan="5">OWNER &amp; ACTION</th>
+        </tr>
+        <tr>
+          <th class="col">Control ID</th><th class="col">Control</th><th class="col">Objective / Description</th>
+          <th class="col">Control Type</th><th class="col">Control Nature</th>
+          <th class="col">Risks Mitigated</th><th class="col"># Risks</th>
+          <th class="col">Implementation Status</th><th class="col">Control Effectiveness</th>
+          <th class="col">Control Owner</th><th class="col">Evidence / Reference</th>
+          <th class="col">Action Plan / Notes</th><th class="col">Target Date</th><th class="col">Status</th>
+        </tr>
+      </thead>
       <tbody>${rows}</tbody>
     </table></div></div>`;
 }
-function setCtrl(ix,k,v){DATA.controls[ix][k]=v;save();renderControls();renderRisks();renderDash();renderMatrix();}
+/* descriptive fields: persist only (no re-render, so text inputs keep focus) */
+function setCtrlField(ix,k,v){DATA.controls[ix][k]=v;save();}
+/* assessment fields that drive residual risk: persist + recalc dependent views */
+function setCalc(ix,k,v){DATA.controls[ix][k]=v;save();renderRisks();renderDash();renderMatrix();}
 
 /* ---------- LEGEND / METHODOLOGY ---------- */
 function renderLegend(){
@@ -492,11 +537,11 @@ function exportCSV(){
 function importJSON(){
   const inp=document.createElement("input");inp.type="file";inp.accept="application/json";
   inp.onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();
-    rd.onload=()=>{try{DATA=JSON.parse(rd.result);save();renderAll();go(location.hash.slice(1)||"dash");}
+    rd.onload=()=>{try{DATA=JSON.parse(rd.result);normalizeCtrls();save();renderAll();go(location.hash.slice(1)||"dash");}
       catch(err){alert("That file couldn't be read as RCSA data.");}};rd.readAsText(f);};
   inp.click();
 }
-function resetAll(){if(confirm("Reset all entries back to the template defaults?")){DATA=clone(SEED);save();renderAll();go("dash");}}
+function resetAll(){if(confirm("Reset all entries back to the template defaults?")){DATA=clone(SEED);normalizeCtrls();save();renderAll();go("dash");}}
 
 renderAll();
 go(location.hash.slice(1)||"dash");
