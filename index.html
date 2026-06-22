@@ -143,6 +143,23 @@ select.ef-NotTested{background:#FFFFFF;color:#2F4DC4;border-color:var(--line)}
 .ctrl-tbl input.dt{min-width:124px}
 .ctrl-tbl select.status-sel{color:var(--brand);font-weight:600;text-align:center;text-align-last:center;min-width:108px}
 
+/* Risk Register — Excel "Risk Register" layout */
+.rr-tbl{font-size:12.5px}
+.rr-tbl th{position:static;white-space:normal;text-transform:none}
+.rr-tbl th.band{color:#fff;font-family:"Space Grotesk";font-size:11px;font-weight:600;letter-spacing:.07em;
+  text-align:center;border:1px solid rgba(255,255,255,.22);padding:7px 8px}
+.rr-band-dark{background:#404040}
+.rr-band-gold{background:#7F6000}
+.rr-band-blue{background:#2E5496}
+.rr-band-purple{background:#5B2C6F}
+.rr-tbl th.col{background:#2E5496;color:#fff;font-size:10px;letter-spacing:.02em;font-weight:600;
+  text-align:center;border:1px solid rgba(255,255,255,.18);padding:8px 9px;vertical-align:middle}
+.rr-tbl td{border:1px solid var(--line);vertical-align:middle}
+.rr-tbl .desc{color:var(--muted);font-size:11.5px;max-width:260px;white-space:normal}
+.rr-tbl .mapids{font-family:"JetBrains Mono";font-size:10.5px;color:var(--muted);max-width:130px;white-space:normal;text-align:center}
+.rr-tbl input.dt{min-width:124px}
+.rr-tbl select.blue-sel{color:var(--brand);font-weight:600}
+
 /* matrix */
 .mtx{font-size:11px}.mtx th,.mtx td{padding:5px 6px;text-align:center;border:1px solid var(--line)}
 .mtx th.grp{font-family:"Space Grotesk";background:var(--surface-2);letter-spacing:.06em}
@@ -272,9 +289,11 @@ const EFF_WEIGHT={"Effective":1,"Partially Effective":0.5,"Ineffective":0,"Not T
 
 /* ---------- model + calc engine ---------- */
 let DATA=clone(load()||SEED);
-normalizeCtrls();
+normalizeData();
 function clone(o){return JSON.parse(JSON.stringify(o));}
+function normalizeData(){normalizeCtrls();normalizeRisks();}
 function normalizeCtrls(){DATA.controls.forEach(c=>{if(c.action==null)c.action="";if(c.target==null)c.target="";if(c.status==null)c.status="To Do";});}
+function normalizeRisks(){DATA.risks.forEach(r=>{if(r.ctrlEff==null)r.ctrlEff="Not Tested";if(r.actionOwner==null)r.actionOwner="";if(r.target==null)r.target="";});}
 function ctrlById(id){return DATA.controls.find(c=>c.id===id);}
 function rnd(x){return Math.floor(Math.abs(x)+0.5)*Math.sign(x)||0;} // round half away from zero
 
@@ -381,8 +400,9 @@ function renderRisks(){
     const R=residual(r);
     return `<tr>
       <td><span class="rid">${r.id}</span></td>
-      <td><div class="rname">${esc(r.name)}</div><div class="rdesc">${esc(r.desc)}</div>
-          <div class="mono" style="font-size:10.5px;color:var(--faint);margin-top:4px">ctrls: ${r.ctrls.join(", ")}</div></td>
+      <td><div class="rname">${esc(r.name)}</div></td>
+      <td class="desc">${esc(r.desc)}</td>
+      <td class="mapids">${r.ctrls.join(", ")}</td>
       <td class="numcell">${r.ctrls.length}</td>
       <td class="numcell"><input class="fld li" type="number" min="1" max="5" value="${r.inhL}"
           oninput="setRisk(${ix},'inhL',+this.value)"></td>
@@ -390,25 +410,50 @@ function renderRisks(){
           oninput="setRisk(${ix},'inhI',+this.value)"></td>
       <td class="numcell"><span class="score-chip">${R.inhScore}</span></td>
       <td>${ratingPill(R.inhRating)}</td>
-      <td class="numcell mono" title="Avg control effectiveness">${R.avg.toFixed(2)}</td>
-      <td class="numcell"><span class="score-chip">${R.rl}×${R.ri}=${R.score}</span></td>
+      <td><select class="blue-sel" onchange="setRiskField(${ix},'ctrlEff',this.value)">${opt(EFFS,r.ctrlEff)}</select></td>
+      <td class="numcell"><span class="score-chip">${R.rl}</span></td>
+      <td class="numcell"><span class="score-chip">${R.ri}</span></td>
+      <td class="numcell"><span class="score-chip">${R.score}</span></td>
       <td>${ratingPill(R.rating)}</td>
-      <td><select onchange="setRisk(${ix},'response',this.value)">${opt(RESPONSES,r.response)}</select></td>
-      <td><input class="fld" value="${esc(r.owner)}" placeholder="owner" oninput="setRisk(${ix},'owner',this.value)"></td>
-      <td><input class="fld" value="${esc(r.action)}" placeholder="action plan" oninput="setRisk(${ix},'action',this.value)"></td>
-      <td><select onchange="setRisk(${ix},'status',this.value)">${opt(STATUSES,r.status)}</select></td>
+      <td><select onchange="setRiskField(${ix},'response',this.value)">${opt(RESPONSES,r.response)}</select></td>
+      <td><input class="fld" value="${esc(r.owner)}" placeholder="owner" oninput="setRiskField(${ix},'owner',this.value)"></td>
+      <td><input class="fld" value="${esc(r.action)}" placeholder="action plan" oninput="setRiskField(${ix},'action',this.value)"></td>
+      <td><input class="fld" value="${esc(r.actionOwner)}" placeholder="action owner" oninput="setRiskField(${ix},'actionOwner',this.value)"></td>
+      <td><input class="fld dt" type="date" value="${esc(r.target)}" oninput="setRiskField(${ix},'target',this.value)"></td>
+      <td><select class="blue-sel" onchange="setRiskField(${ix},'status',this.value)">${opt(STATUSES,r.status)}</select></td>
+      <td class="numcell mono" title="Average mapped-control effectiveness weight">${R.avg.toFixed(2)}</td>
     </tr>`;
   }).join("");
   $("#v-risks").innerHTML=`<div class="card">
     <div class="card-h"><span class="section-eyebrow">Register</span><h2>SDLC Risks</h2>
       <span class="note">Edit inherent L &amp; I; residual is calculated from mapped-control effectiveness</span></div>
-    <div class="tbl-scroll"><table>
-      <thead><tr><th>ID</th><th>Risk</th><th>#</th><th>Inh L</th><th>Inh I</th><th>Inh</th><th>Inh rating</th>
-        <th>Avg eff</th><th>Residual</th><th>Res rating</th><th>Response</th><th>Owner</th><th>Action plan</th><th>Status</th></tr></thead>
+    <div class="tbl-scroll"><table class="rr-tbl">
+      <thead>
+        <tr>
+          <th class="band rr-band-dark" colspan="5">RISK</th>
+          <th class="band rr-band-gold" colspan="4">INHERENT RISK</th>
+          <th class="band rr-band-blue" colspan="1">EFFECT.</th>
+          <th class="band rr-band-gold" colspan="4">RESIDUAL RISK</th>
+          <th class="band rr-band-purple" colspan="6">RESPONSE &amp; OWNER</th>
+          <th class="band rr-band-gold" colspan="1">CONTROL-DRIVEN</th>
+        </tr>
+        <tr>
+          <th class="col">Risk ID</th><th class="col">Risk</th><th class="col">Description</th>
+          <th class="col">Mapped Control IDs</th><th class="col"># Ctrls</th>
+          <th class="col">Inh. L</th><th class="col">Inh. I</th><th class="col">Inh. Score</th><th class="col">Inh. Rating</th>
+          <th class="col">Control Effectiveness</th>
+          <th class="col">Res. L</th><th class="col">Res. I</th><th class="col">Res. Score</th><th class="col">Res. Rating</th>
+          <th class="col">Risk Response</th><th class="col">Risk Owner</th><th class="col">Action Plan</th>
+          <th class="col">Action Owner</th><th class="col">Target Date</th><th class="col">Status</th>
+          <th class="col">Avg Ctrl Eff</th>
+        </tr>
+      </thead>
       <tbody>${rows}</tbody>
     </table></div></div>`;
 }
-function setRisk(ix,k,v){DATA.risks[ix][k]=v;save();renderRisks();renderDash();}
+/* inherent L/I drive residual + dashboard → recompute; descriptive fields persist only */
+function setRisk(ix,k,v){DATA.risks[ix][k]=v;save();renderRisks();renderDash();renderMatrix();}
+function setRiskField(ix,k,v){DATA.risks[ix][k]=v;save();}
 
 /* ---------- MATRIX ---------- */
 function effAbbr(e){return {"Effective":"Eff","Partially Effective":"Part","Ineffective":"Inef","Not Tested":"NT"}[e]||e;}
@@ -563,11 +608,11 @@ function exportCSV(){
 function importJSON(){
   const inp=document.createElement("input");inp.type="file";inp.accept="application/json";
   inp.onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();
-    rd.onload=()=>{try{DATA=JSON.parse(rd.result);normalizeCtrls();save();renderAll();go(location.hash.slice(1)||"dash");}
+    rd.onload=()=>{try{DATA=JSON.parse(rd.result);normalizeData();save();renderAll();go(location.hash.slice(1)||"dash");}
       catch(err){alert("That file couldn't be read as RCSA data.");}};rd.readAsText(f);};
   inp.click();
 }
-function resetAll(){if(confirm("Reset all entries back to the template defaults?")){DATA=clone(SEED);normalizeCtrls();save();renderAll();go("dash");}}
+function resetAll(){if(confirm("Reset all entries back to the template defaults?")){DATA=clone(SEED);normalizeData();save();renderAll();go("dash");}}
 
 renderAll();
 go(location.hash.slice(1)||"dash");
