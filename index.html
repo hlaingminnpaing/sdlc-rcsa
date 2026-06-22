@@ -71,8 +71,10 @@ nav.tabs button.active{color:var(--brand);border-bottom-color:var(--brand)}
 .stat .k{font-size:11px;letter-spacing:.04em;color:var(--muted);text-transform:uppercase;font-weight:600}
 .stat .v{font-family:"Space Grotesk";font-size:30px;font-weight:600;margin-top:4px;line-height:1}
 .stat .v small{font-size:13px;color:var(--faint);font-weight:500}
-.dash-2{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
+.dash-2{display:grid;grid-template-columns:1fr 360px;gap:18px;align-items:start}
 @media(max-width:880px){.dash-2{grid-template-columns:1fr}.dash-grid{grid-template-columns:repeat(2,1fr)}}
+.heat.capped{max-width:360px;margin:0 auto}
+.rbr th{white-space:normal}
 
 /* heat map */
 .heat-wrap{padding:18px}
@@ -395,6 +397,27 @@ function renderDash(){
       </div>`;}).join("")}
     </div></div>`;
 
+  const heatCard=`<div class="card">
+    <div class="card-h"><span class="section-eyebrow">Live</span><h2>Residual Risk Heat Map</h2></div>
+    <div class="heat-wrap">
+      <div class="heat capped">${grid}</div>
+      <div class="axis-label">Impact →</div>
+      <div class="heat-cap"><span>Each dot is a risk at its residual position</span></div>
+    </div></div>`;
+
+  const riskByRatingCard=`<div class="card">
+    <div class="card-h"><span class="section-eyebrow">Posture</span><h2>Risk by Rating</h2></div>
+    <div class="tbl-scroll">
+      <table class="rbr">
+        <thead><tr><th>Residual risk by rating</th><th class="numcell">Count</th><th>Inherent risk by rating</th><th class="numcell">Count</th></tr></thead>
+        <tbody>
+          ${["Critical","High","Medium","Low"].map(r=>`<tr>
+            <td>${ratingPill(r)}</td><td class="numcell">${cnt(r)}</td>
+            <td>${ratingPill(r)}</td><td class="numcell">${cntInh(r)}</td></tr>`).join("")}
+        </tbody>
+      </table>
+    </div></div>`;
+
   $("#v-dash").innerHTML=`
     <div class="dash-grid">
       ${stat("Total risks",DATA.risks.length)}
@@ -403,33 +426,14 @@ function renderDash(){
       ${stat("Implementation",implPct+"%")}
     </div>
     <div class="dash-2">
-      <div class="card">
-        <div class="card-h"><span class="section-eyebrow">Live</span><h2>Residual Risk Heat Map</h2></div>
-        <div class="heat-wrap">
-          <div class="heat">${grid}</div>
-          <div class="axis-label">Impact →</div>
-          <div class="heat-cap"><span>Each dot is a risk at its residual position</span></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-h"><span class="section-eyebrow">Posture</span><h2>Risk by Rating</h2></div>
-        <div class="tbl-scroll">
-          <table>
-            <thead><tr><th>Residual risk by rating</th><th class="numcell">Count</th><th>Inherent risk by rating</th><th class="numcell">Count</th></tr></thead>
-            <tbody>
-              ${["Critical","High","Medium","Low"].map(r=>`<tr>
-                <td>${ratingPill(r)}</td><td class="numcell">${cnt(r)}</td>
-                <td>${ratingPill(r)}</td><td class="numcell">${cntInh(r)}</td></tr>`).join("")}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      ${effGroupCard}
+      ${riskByRatingCard}
     </div>
     <div class="dash-tables">
       ${tbl("Controls","Control implementation status","Implementation",IMPLS.map(i=>[i,ci(i)]))}
       ${tbl("Controls","Controls by group","Group",GROUPS.map(g=>[g+" Controls",cg(g)]))}
       ${tbl("Controls","Control effectiveness","Effectiveness",EFFS.map(e=>[effDot(e)+e,ce(e)]))}
-      ${effGroupCard}
+      ${heatCard}
     </div>`;
 }
 
