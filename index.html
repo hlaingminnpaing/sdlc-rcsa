@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SDLC RCSA — Risk &amp; Control Self-Assessment</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#F6F7F9; --surface:#FFFFFF; --surface-2:#FBFCFD;
+  --ink:#16202E; --muted:#5B6B7E; --faint:#8C9AAB;
+  --line:#E4E8EE; --line-strong:#CdD5DF;
+  --brand:#2F4DC4; --brand-soft:#EAEEFB;
+  --crit:#B42318; --crit-bg:#FDEAE7;
+  --high:#B54708; --high-bg:#FDF0DC;
+  --med:#9A7400;  --med-bg:#FCF6D8;
+  --low:#067647;  --low-bg:#DCF6E8;
+  --eff:#067647; --part:#9A7400; --ineff:#B42318; --nt:#7A8696;
+  --shadow:0 1px 2px rgba(16,32,46,.05),0 8px 24px -16px rgba(16,32,46,.18);
+}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:"Space Grotesk",sans-serif;font-weight:600;letter-spacing:-.01em;margin:0}
+.mono{font-family:"JetBrains Mono",monospace}
+button{font-family:inherit}
+a{color:var(--brand)}
+
+/* shell */
+.shell{max-width:1280px;margin:0 auto;padding:0 22px 80px}
+header.top{display:flex;align-items:center;gap:18px;padding:20px 0 16px;flex-wrap:wrap}
+.brand-mark{font-family:"Space Grotesk";font-weight:700;font-size:13px;letter-spacing:.14em;color:var(--brand);
+  border:1.5px solid var(--brand);border-radius:7px;padding:5px 9px;line-height:1}
+header.top h1{font-size:19px}
+header.top .sub{color:var(--muted);font-size:12.5px;margin-top:1px}
+.top-actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:8px;
+  padding:7px 12px;font-size:12.5px;font-weight:500;cursor:pointer;transition:.12s}
+.btn:hover{border-color:var(--brand);color:var(--brand)}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.primary:hover{filter:brightness(1.05);color:#fff}
+
+/* meta bar */
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:1px;background:var(--line);
+  border:1px solid var(--line);border-radius:12px;overflow:hidden;margin-bottom:18px}
+.meta .cell{background:var(--surface);padding:10px 13px}
+.meta label{display:block;font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin-bottom:3px}
+.meta input{border:0;width:100%;font-family:inherit;font-size:13px;color:var(--ink);background:transparent;outline:none;font-weight:500}
+.meta input::placeholder{color:var(--faint);font-weight:400}
+
+/* tabs */
+nav.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:22px;overflow-x:auto}
+nav.tabs button{border:0;background:transparent;color:var(--muted);font-size:13.5px;font-weight:500;
+  padding:11px 14px;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:.12s}
+nav.tabs button:hover{color:var(--ink)}
+nav.tabs button.active{color:var(--brand);border-bottom-color:var(--brand)}
+.view{display:none}.view.active{display:block;animation:fade .25s ease}
+@keyframes fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:none}}
+
+/* cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:13px;box-shadow:var(--shadow)}
+.card-h{padding:14px 18px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:10px}
+.card-h h2{font-size:15px}.card-h .note{color:var(--muted);font-size:12px}
+.section-eyebrow{font-size:10.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--faint);font-weight:600;font-family:"Space Grotesk"}
+
+/* dashboard */
+.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:18px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:15px 16px;box-shadow:var(--shadow)}
+.stat .k{font-size:11px;letter-spacing:.04em;color:var(--muted);text-transform:uppercase;font-weight:600}
+.stat .v{font-family:"Space Grotesk";font-size:30px;font-weight:600;margin-top:4px;line-height:1}
+.stat .v small{font-size:13px;color:var(--faint);font-weight:500}
+.dash-2{display:grid;grid-template-columns:340px 1fr;gap:18px;align-items:start}
+@media(max-width:880px){.dash-2{grid-template-columns:1fr}.dash-grid{grid-template-columns:repeat(2,1fr)}}
+
+/* heat map */
+.heat-wrap{padding:18px}
+.heat{display:grid;grid-template-columns:auto repeat(5,1fr);gap:5px}
+.heat .axis{font-size:10px;color:var(--faint);display:flex;align-items:center;justify-content:center;font-weight:600}
+.heat .corner{font-size:9.5px;color:var(--faint);text-align:center}
+.cellh{position:relative;aspect-ratio:1/1;border-radius:7px;display:flex;align-items:center;justify-content:center;
+  font-family:"JetBrains Mono";font-size:11px;font-weight:600;color:rgba(0,0,0,.4)}
+.cellh .dots{position:absolute;inset:0;display:flex;flex-wrap:wrap;gap:2px;align-items:center;justify-content:center;padding:5px}
+.cellh .dot{width:9px;height:9px;border-radius:50%;background:var(--ink);box-shadow:0 0 0 1.5px #fff;
+  font-size:0;cursor:default}
+.heat-cap{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted);margin-top:10px;padding:0 2px}
+.axis-label{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);text-align:center;margin-top:8px;font-weight:600}
+
+/* tables */
+.tbl-scroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{font-family:"Space Grotesk";font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);
+  font-weight:600;text-align:left;padding:9px 11px;border-bottom:1px solid var(--line);white-space:nowrap;position:sticky;top:0;background:var(--surface)}
+td{padding:9px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:hover{background:var(--surface-2)}
+.rid{font-family:"JetBrains Mono";font-size:12px;font-weight:600;color:var(--brand)}
+.rname{font-weight:600}
+.rdesc{color:var(--muted);font-size:12px;max-width:340px}
+.numcell{font-family:"JetBrains Mono";text-align:center;font-weight:500}
+
+/* inputs in tables */
+select,input.fld{font-family:inherit;font-size:12.5px;border:1px solid var(--line);border-radius:7px;
+  padding:5px 7px;background:var(--surface);color:var(--ink);outline:none;width:100%;min-width:90px}
+select:focus,input.fld:focus{border-color:var(--brand);box-shadow:0 0 0 3px var(--brand-soft)}
+input.li{width:46px;text-align:center;min-width:0}
+
+/* rating + status pills */
+.pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;font-family:"JetBrains Mono";
+  padding:3px 8px;border-radius:999px;white-space:nowrap}
+.r-Critical{color:var(--crit);background:var(--crit-bg)} .r-High{color:var(--high);background:var(--high-bg)}
+.r-Medium{color:var(--med);background:var(--med-bg)} .r-Low{color:var(--low);background:var(--low-bg)}
+.score-chip{font-family:"JetBrains Mono";font-weight:600;font-size:12px;display:inline-block;min-width:26px;text-align:center}
+.dot-eff{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.e-Effective{background:var(--eff)} .e-Partially{background:var(--part)} .e-Ineffective{background:var(--ineff)} .e-NotTested{background:var(--nt)}
+
+/* matrix */
+.mtx{font-size:11px}.mtx th,.mtx td{padding:5px 6px;text-align:center;border:1px solid var(--line)}
+.mtx th.grp{font-family:"Space Grotesk";background:var(--surface-2);letter-spacing:.06em}
+.mtx td.x{background:var(--brand-soft);color:var(--brand);font-weight:700}
+.mtx td.risklbl{text-align:left;white-space:nowrap}
+.mtx .cid{writing-mode:vertical-rl;transform:rotate(180deg);font-family:"JetBrains Mono";font-size:10px}
+.mtx tr:hover td{background:#F2F5FE}
+
+/* legend / methodology */
+.prose{padding:18px 20px;max-width:760px}
+.prose h3{font-size:14px;margin:18px 0 8px}
+.prose p{color:var(--muted);margin:8px 0}
+.legend-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:18px}
+@media(max-width:720px){.legend-grid{grid-template-columns:1fr}}
+.mini th,.mini td{font-size:12px;padding:6px 9px}
+.formula{background:var(--surface-2);border:1px solid var(--line);border-radius:9px;padding:12px 14px;
+  font-family:"JetBrains Mono";font-size:12.5px;color:var(--ink);margin:10px 0;white-space:pre-wrap}
+.foot{color:var(--faint);font-size:11.5px;text-align:center;margin-top:30px}
+.cov-bar{height:7px;border-radius:4px;background:var(--line);overflow:hidden;min-width:80px}
+.cov-bar > i{display:block;height:100%;background:var(--brand)}
+.grp-row td{background:var(--surface-2);font-family:"Space Grotesk";font-weight:600;font-size:11px;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+.saved{font-size:11.5px;color:var(--low);opacity:0;transition:opacity .3s}
+.saved.show{opacity:1}
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <span class="brand-mark">RCSA</span>
+    <div>
+      <h1>SDLC Risk &amp; Control Self-Assessment</h1>
+      <div class="sub">9 risks · 22 controls · residual risk driven live by control effectiveness</div>
+    </div>
+    <div class="top-actions">
+      <span id="saved" class="saved">saved</span>
+      <button class="btn" onclick="exportJSON()">Export data</button>
+      <button class="btn" onclick="importJSON()">Import</button>
+      <button class="btn" onclick="exportCSV()">Export CSV</button>
+      <button class="btn" onclick="resetAll()">Reset to template</button>
+    </div>
+  </header>
+
+  <div class="meta" id="meta"></div>
+
+  <nav class="tabs" id="tabs"></nav>
+
+  <section id="v-dash" class="view"></section>
+  <section id="v-risks" class="view"></section>
+  <section id="v-matrix" class="view"></section>
+  <section id="v-controls" class="view"></section>
+  <section id="v-legend" class="view"></section>
+
+  <div class="foot">Reference model adapted from the Kosli Secure SDLC framework · all ratings are illustrative — reassess for your organisation</div>
+</div>
+
+<script>
+/* ---------- storage (safe: works on GitHub Pages, degrades in sandboxes) ---------- */
+const KEY="sdlc_rcsa_v2";
+let mem=null;
+function store(obj){ try{localStorage.setItem(KEY,JSON.stringify(obj));}catch(e){mem=obj;} flashSaved(); }
+function load(){ try{const r=localStorage.getItem(KEY); if(r)return JSON.parse(r);}catch(e){} return mem; }
+function flashSaved(){const s=document.getElementById("saved");s.classList.add("show");clearTimeout(flashSaved._t);flashSaved._t=setTimeout(()=>s.classList.remove("show"),1200);}
+
+/* ---------- seed data (from your template) ---------- */
+const SEED={
+  meta:{org:"",scope:"",period:"",assessor:"",prepared:"",review:""},
+  risks:[
+    {id:"RISK-0001",name:"Supply Chain Compromise",desc:"Malicious or tampered components (open-source libraries, base images, build tools, third-party services) enter the SDLC, resulting in compromised applications reaching production.",ctrls:["0002","0003","0004","0013","0016","0020","0021","0022"],inhL:4,inhI:5,response:"Mitigate",owner:"",action:"",status:"Implemented"},
+    {id:"RISK-0002",name:"Insider Threat",desc:"Authorised personnel (or attackers using their credentials) misuse legitimate access to repositories, environments or production to compromise confidentiality, integrity or availability.",ctrls:["0001","0007","0010","0012","0013","0014","0015","0016","0017"],inhL:3,inhI:5,response:"Mitigate",owner:"",action:"",status:"In Progress"},
+    {id:"RISK-0003",name:"Unauthorised Deployment",desc:"Software is deployed to production without passing required quality gates, security scans or approval checks.",ctrls:["0002","0010","0013","0016"],inhL:3,inhI:4,response:"Mitigate",owner:"",action:"",status:"In Progress"},
+    {id:"RISK-0004",name:"Credential and Secret Exposure",desc:"Leaked or poorly managed secrets enable unauthorised access to production systems, customer data or pipelines.",ctrls:["0001","0006","0014","0015"],inhL:4,inhI:5,response:"Mitigate",owner:"",action:"",status:"In Progress"},
+    {id:"RISK-0005",name:"Vulnerable Software in Production",desc:"Known vulnerabilities in code or dependencies are exploited in the production environment.",ctrls:["0004","0008","0016","0019","0020","0021","0022"],inhL:4,inhI:4,response:"Mitigate",owner:"",action:"",status:"In Progress"},
+    {id:"RISK-0006",name:"Audit and Compliance Failure",desc:"Inability to evidence controls to regulators, auditors or enterprise customers, resulting in reputational or commercial damage.",ctrls:["0002","0007","0010","0012","0015","0016"],inhL:3,inhI:4,response:"Mitigate",owner:"",action:"",status:"In Progress"},
+    {id:"RISK-0007",name:"Unauthorised System Access",desc:"Production environments are accessed by personnel without appropriate authorisation or full audit trails.",ctrls:["0014","0015"],inhL:3,inhI:5,response:"Mitigate",owner:"",action:"",status:"In Progress"},
+    {id:"RISK-0008",name:"Configuration Drift",desc:"Infrastructure or application configuration diverges from its known, approved state, causing undetected changes in security posture or behaviour.",ctrls:["0001","0005","0012","0013","0018"],inhL:4,inhI:3,response:"Mitigate",owner:"",action:"",status:"In Progress"},
+    {id:"RISK-0009",name:"Environment Breach",desc:"An external attacker runs unauthorised workloads within the production environment.",ctrls:["0015","0016","0019"],inhL:3,inhI:5,response:"Mitigate",owner:"",action:"",status:"In Progress"}
+  ],
+  controls:[
+    {id:"0001",name:"Version Control",obj:"All source code and configuration is managed in version control with full, traceable history.",type:"Preventive",nature:"Hybrid",group:"Build",impl:"Not Implemented",eff:"Effective",owner:"",evidence:""},
+    {id:"0002",name:"Artifact Binary Provenance",obj:"Build artifacts are traceable to their source commit and build; provenance is attested and verifiable.",type:"Preventive & Detective",nature:"Automated",group:"Build",impl:"Not Implemented",eff:"Ineffective",owner:"",evidence:""},
+    {id:"0003",name:"Controlled Build Environment",obj:"Builds run in a controlled, reproducible environment using approved, hardened toolchains.",type:"Preventive",nature:"Automated",group:"Build",impl:"Implemented",eff:"Effective",owner:"",evidence:""},
+    {id:"0004",name:"Dependency Management",obj:"Third-party and open-source dependencies are inventoried, approved and kept current; SBOM maintained.",type:"Preventive & Detective",nature:"Automated",group:"Build",impl:"Not Implemented",eff:"Effective",owner:"",evidence:""},
+    {id:"0005",name:"Infrastructure and Configuration as Code",obj:"Infrastructure and configuration are defined as code, version-controlled and peer-reviewed.",type:"Preventive",nature:"Automated",group:"Build",impl:"Not Implemented",eff:"Not Tested",owner:"",evidence:""},
+    {id:"0006",name:"Secrets Scanning",obj:"Code and artifacts are scanned to detect secrets/credentials before reaching shared repositories.",type:"Detective",nature:"Automated",group:"Build",impl:"Implemented",eff:"Not Tested",owner:"",evidence:""},
+    {id:"0007",name:"Code Review",obj:"Changes are peer-reviewed and approved before being merged or released.",type:"Preventive",nature:"Hybrid",group:"Release",impl:"Implemented",eff:"Effective",owner:"",evidence:""},
+    {id:"0008",name:"Quality Assurance",obj:"Automated and manual testing validates functionality and quality before release.",type:"Detective",nature:"Hybrid",group:"Release",impl:"Not Implemented",eff:"Not Tested",owner:"",evidence:""},
+    {id:"0020",name:"Vulnerability Scanning — SAST",obj:"Static application security testing detects code-level vulnerabilities before release.",type:"Detective",nature:"Automated",group:"Release",impl:"Implemented",eff:"Ineffective",owner:"",evidence:""},
+    {id:"0021",name:"Vulnerability Scanning — SCA",obj:"Software composition analysis detects vulnerable dependencies before release.",type:"Detective",nature:"Automated",group:"Release",impl:"Implemented",eff:"Ineffective",owner:"",evidence:""},
+    {id:"0022",name:"Vulnerability Scanning — Containers",obj:"Container images are scanned for vulnerabilities before release.",type:"Detective",nature:"Automated",group:"Release",impl:"Implemented",eff:"Ineffective",owner:"",evidence:""},
+    {id:"0010",name:"Deployment Approvals",obj:"Production deployments require defined approvals and must pass required gates.",type:"Preventive",nature:"Hybrid",group:"Release",impl:"Implemented",eff:"Not Tested",owner:"",evidence:""},
+    {id:"0023",name:"Feature Flags",obj:"Functionality is controlled via feature flags to enable safe, reversible release.",type:"Corrective",nature:"Automated",group:"Release",impl:"Not Implemented",eff:"Not Tested",owner:"",evidence:""},
+    {id:"0012",name:"Change Records",obj:"Every production change is captured in a traceable, auditable change record.",type:"Detective",nature:"Automated",group:"Runtime",impl:"Not Implemented",eff:"Not Tested",owner:"",evidence:""},
+    {id:"0013",name:"Deployment Controls",obj:"Only verified, approved artifacts can be deployed; deployment mechanisms are controlled.",type:"Preventive",nature:"Automated",group:"Runtime",impl:"Not Implemented",eff:"Not Tested",owner:"",evidence:""},
+    {id:"0014",name:"Secrets Management",obj:"Runtime secrets are stored, rotated and accessed through a managed secrets solution.",type:"Preventive",nature:"Automated",group:"Runtime",impl:"Not Implemented",eff:"Effective",owner:"",evidence:""},
+    {id:"0015",name:"System Access Controls",obj:"Production access is least-privilege, authenticated, time-bound and logged.",type:"Preventive",nature:"Hybrid",group:"Runtime",impl:"Not Implemented",eff:"Effective",owner:"",evidence:""},
+    {id:"0016",name:"Runtime Workload Monitoring",obj:"Running workloads are monitored to detect anomalous or unauthorised activity.",type:"Detective",nature:"Automated",group:"Runtime",impl:"Not Implemented",eff:"Effective",owner:"",evidence:""},
+    {id:"0018",name:"Drift Detection",obj:"Deviations from the approved, declared state are detected and alerted.",type:"Detective",nature:"Automated",group:"Runtime",impl:"Not Implemented",eff:"Not Tested",owner:"",evidence:""},
+    {id:"0017",name:"Training",obj:"Personnel receive security and process training relevant to their role.",type:"Preventive",nature:"Manual",group:"Lifecycle",impl:"Not Implemented",eff:"Not Tested",owner:"",evidence:""},
+    {id:"0019",name:"Penetration Testing",obj:"Independent penetration testing periodically identifies exploitable weaknesses.",type:"Detective",nature:"Hybrid",group:"Lifecycle",impl:"Not Implemented",eff:"Effective",owner:"",evidence:""},
+    {id:"0011",name:"Service Ownership",obj:"Every service has a defined owner accountable for its security and operation.",type:"Preventive",nature:"Manual",group:"Lifecycle",impl:"Not Implemented",eff:"Not Tested",owner:"",evidence:""}
+  ]
+};
+
+const GROUPS=["Build","Release","Runtime","Lifecycle"];
+const EFFS=["Effective","Partially Effective","Ineffective","Not Tested"];
+const IMPLS=["Implemented","Partially Implemented","Planned","Not Implemented"];
+const RESPONSES=["Mitigate","Accept","Transfer","Avoid"];
+const STATUSES=["To Do","In Progress","Implemented","Accepted","Closed"];
+const EFF_WEIGHT={"Effective":1,"Partially Effective":0.5,"Ineffective":0,"Not Tested":0};
+
+/* ---------- model + calc engine ---------- */
+let DATA=clone(load()||SEED);
+function clone(o){return JSON.parse(JSON.stringify(o));}
+function ctrlById(id){return DATA.controls.find(c=>c.id===id);}
+function rnd(x){return Math.floor(Math.abs(x)+0.5)*Math.sign(x)||0;} // round half away from zero
+
+function avgEff(risk){
+  if(!risk.ctrls.length)return 0;
+  let s=0;for(const id of risk.ctrls){const c=ctrlById(id); s+=c?EFF_WEIGHT[c.eff]:0;}
+  return s/risk.ctrls.length;
+}
+function rating(score){return score>=15?"Critical":score>=8?"High":score>=4?"Medium":"Low";}
+function residual(risk){
+  const a=avgEff(risk);
+  const rl=Math.min(5,Math.max(1,rnd(risk.inhL-(risk.inhL-1)*a)));
+  const ri=Math.min(5,Math.max(1,rnd(risk.inhI-(risk.inhI-1)*a)));
+  const sc=rl*ri;
+  return {avg:a,rl,ri,score:sc,rating:rating(sc),inhScore:risk.inhL*risk.inhI,inhRating:rating(risk.inhL*risk.inhI)};
+}
+function risksForControl(cid){return DATA.risks.filter(r=>r.ctrls.includes(cid)).map(r=>r.id.replace("RISK-",""));}
+
+/* ---------- render helpers ---------- */
+const $=s=>document.querySelector(s);
+function ratingPill(r){return `<span class="pill r-${r}">${r}</span>`;}
+function effDot(e){const k=e.replace(/ /g,"").replace("PartiallyEffective","Partially");return `<span class="dot-eff e-${k}"></span>`;}
+function opt(list,sel){return list.map(v=>`<option ${v===sel?"selected":""}>${v}</option>`).join("");}
+function esc(s){return(s||"").replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* ---------- META ---------- */
+function renderMeta(){
+  const f=[["org","Organization / Product"],["scope","In-scope systems"],["period","Assessment period"],
+    ["assessor","Risk owner / Assessor"],["prepared","Date prepared"],["review","Next review due"]];
+  $("#meta").innerHTML=f.map(([k,l])=>`<div class="cell"><label>${l}</label>
+    <input value="${esc(DATA.meta[k])}" placeholder="[ enter ]" oninput="DATA.meta['${k}']=this.value;save()"></div>`).join("");
+}
+
+/* ---------- DASHBOARD ---------- */
+function renderDash(){
+  const res=DATA.risks.map(residual);
+  const cnt=t=>res.filter(r=>r.rating===t).length;
+  const cntInh=t=>res.filter(r=>r.inhRating===t).length;
+  const ce=e=>DATA.controls.filter(c=>c.eff===e).length;
+  const ci=i=>DATA.controls.filter(c=>c.impl===i).length;
+
+  // heat map placement (residual)
+  let cells="";
+  const head=`<div class="corner">I→ / L↓</div>`+[1,2,3,4,5].map(i=>`<div class="axis">${i}</div>`).join("");
+  let grid=head;
+  for(let l=5;l>=1;l--){
+    grid+=`<div class="axis">${l}</div>`;
+    for(let i=1;i<=5;i++){
+      const sc=l*i, rt=rating(sc);
+      const here=DATA.risks.filter((r,ix)=>res[ix].rl===l&&res[ix].ri===i);
+      const dots=here.map(r=>`<span class="dot" title="${r.id} — ${esc(r.name)}"></span>`).join("");
+      grid+=`<div class="cellh r-${rt}" style="background:var(--${rt==='Critical'?'crit':rt==='High'?'high':rt==='Medium'?'med':'low'}-bg)">
+        <span>${sc}</span><div class="dots">${dots}</div></div>`;
+    }
+  }
+
+  const stat=(k,v,sub)=>`<div class="stat"><div class="k">${k}</div><div class="v">${v}${sub?` <small>${sub}</small>`:""}</div></div>`;
+  const implPct=Math.round(ci("Implemented")/DATA.controls.length*100);
+
+  $("#v-dash").innerHTML=`
+    <div class="dash-grid">
+      ${stat("Total risks",DATA.risks.length)}
+      ${stat("Total controls",DATA.controls.length)}
+      ${stat("Controls implemented",ci("Implemented"),"/ "+DATA.controls.length)}
+      ${stat("Implementation",implPct+"%")}
+    </div>
+    <div class="dash-2">
+      <div class="card">
+        <div class="card-h"><span class="section-eyebrow">Live</span><h2>Residual Risk Heat Map</h2></div>
+        <div class="heat-wrap">
+          <div class="heat">${grid}</div>
+          <div class="axis-label">Impact →</div>
+          <div class="heat-cap"><span>Each dot is a risk at its residual position</span></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-h"><span class="section-eyebrow">Posture</span><h2>Rating &amp; Status Breakdown</h2></div>
+        <div class="tbl-scroll">
+          <table>
+            <thead><tr><th>Residual rating</th><th class="numcell">Count</th><th>Inherent rating</th><th class="numcell">Count</th></tr></thead>
+            <tbody>
+              ${["Critical","High","Medium","Low"].map(r=>`<tr>
+                <td>${ratingPill(r)}</td><td class="numcell">${cnt(r)}</td>
+                <td>${ratingPill(r)}</td><td class="numcell">${cntInh(r)}</td></tr>`).join("")}
+            </tbody>
+          </table>
+          <table style="margin-top:6px">
+            <thead><tr><th>Control effectiveness</th><th class="numcell">Count</th><th>Implementation</th><th class="numcell">Count</th></tr></thead>
+            <tbody>
+              ${EFFS.map((e,ix)=>`<tr>
+                <td>${effDot(e)}${e}</td><td class="numcell">${ce(e)}</td>
+                <td>${IMPLS[ix]}</td><td class="numcell">${ci(IMPLS[ix])}</td></tr>`).join("")}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>`;
+}
+
+/* ---------- RISK REGISTER ---------- */
+function renderRisks(){
+  const rows=DATA.risks.map((r,ix)=>{
+    const R=residual(r);
+    return `<tr>
+      <td><span class="rid">${r.id}</span></td>
+      <td><div class="rname">${esc(r.name)}</div><div class="rdesc">${esc(r.desc)}</div>
+          <div class="mono" style="font-size:10.5px;color:var(--faint);margin-top:4px">ctrls: ${r.ctrls.join(", ")}</div></td>
+      <td class="numcell">${r.ctrls.length}</td>
+      <td class="numcell"><input class="fld li" type="number" min="1" max="5" value="${r.inhL}"
+          oninput="setRisk(${ix},'inhL',+this.value)"></td>
+      <td class="numcell"><input class="fld li" type="number" min="1" max="5" value="${r.inhI}"
+          oninput="setRisk(${ix},'inhI',+this.value)"></td>
+      <td class="numcell"><span class="score-chip">${R.inhScore}</span></td>
+      <td>${ratingPill(R.inhRating)}</td>
+      <td class="numcell mono" title="Avg control effectiveness">${R.avg.toFixed(2)}</td>
+      <td class="numcell"><span class="score-chip">${R.rl}×${R.ri}=${R.score}</span></td>
+      <td>${ratingPill(R.rating)}</td>
+      <td><select onchange="setRisk(${ix},'response',this.value)">${opt(RESPONSES,r.response)}</select></td>
+      <td><input class="fld" value="${esc(r.owner)}" placeholder="owner" oninput="setRisk(${ix},'owner',this.value)"></td>
+      <td><input class="fld" value="${esc(r.action)}" placeholder="action plan" oninput="setRisk(${ix},'action',this.value)"></td>
+      <td><select onchange="setRisk(${ix},'status',this.value)">${opt(STATUSES,r.status)}</select></td>
+    </tr>`;
+  }).join("");
+  $("#v-risks").innerHTML=`<div class="card">
+    <div class="card-h"><span class="section-eyebrow">Register</span><h2>SDLC Risks</h2>
+      <span class="note">Edit inherent L &amp; I; residual is calculated from mapped-control effectiveness</span></div>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>ID</th><th>Risk</th><th>#</th><th>Inh L</th><th>Inh I</th><th>Inh</th><th>Inh rating</th>
+        <th>Avg eff</th><th>Residual</th><th>Res rating</th><th>Response</th><th>Owner</th><th>Action plan</th><th>Status</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div></div>`;
+}
+function setRisk(ix,k,v){DATA.risks[ix][k]=v;save();renderRisks();renderDash();}
+
+/* ---------- MATRIX ---------- */
+function renderMatrix(){
+  const ordered=[];GROUPS.forEach(g=>DATA.controls.filter(c=>c.group===g).forEach(c=>ordered.push(c)));
+  const grpHead=GROUPS.map(g=>`<th class="grp" colspan="${DATA.controls.filter(c=>c.group===g).length}">${g}</th>`).join("");
+  const cidHead=ordered.map(c=>`<th><div class="cid">${c.id}</div></th>`).join("");
+  const body=DATA.risks.map(r=>{
+    const tds=ordered.map(c=>r.ctrls.includes(c.id)?`<td class="x">X</td>`:`<td></td>`).join("");
+    return `<tr><td class="risklbl"><span class="rid">${r.id}</span></td>${tds}<td class="numcell">${r.ctrls.length}</td></tr>`;
+  }).join("");
+  const totals=ordered.map(c=>`<td class="numcell">${risksForControl(c.id).length}</td>`).join("");
+  $("#v-matrix").innerHTML=`<div class="card">
+    <div class="card-h"><span class="section-eyebrow">Mapping</span><h2>Risk–Control Matrix</h2>
+      <span class="note">X = control mitigates the risk</span></div>
+    <div class="tbl-scroll" style="padding:14px">
+      <table class="mtx">
+        <thead>
+          <tr><th></th>${grpHead}<th></th></tr>
+          <tr><th>Risk</th>${cidHead}<th># ctrls</th></tr>
+        </thead>
+        <tbody>${body}<tr><td class="risklbl"><b># risks</b></td>${totals}<td></td></tr></tbody>
+      </table>
+    </div></div>`;
+}
+
+/* ---------- CONTROLS ---------- */
+function renderControls(){
+  let rows="";
+  GROUPS.forEach(g=>{
+    const list=DATA.controls.filter(c=>c.group===g);
+    rows+=`<tr class="grp-row"><td colspan="9">${g} controls · ${list.length}</td></tr>`;
+    list.forEach(c=>{
+      const ix=DATA.controls.indexOf(c);
+      rows+=`<tr>
+        <td><span class="rid">CTRL-${c.id}</span></td>
+        <td><div class="rname">${esc(c.name)}</div><div class="rdesc">${esc(c.obj)}</div>
+            <div class="mono" style="font-size:10.5px;color:var(--faint);margin-top:4px">mitigates: ${risksForControl(c.id).join(", ")||"—"}</div></td>
+        <td style="font-size:12px;color:var(--muted)">${c.type}<br><span style="color:var(--faint)">${c.nature}</span></td>
+        <td><select onchange="setCtrl(${ix},'impl',this.value)">${opt(IMPLS,c.impl)}</select></td>
+        <td><select onchange="setCtrl(${ix},'eff',this.value)">${EFFS.map(e=>`<option ${e===c.eff?'selected':''}>${e}</option>`).join("")}</select></td>
+        <td><input class="fld" value="${esc(c.owner)}" placeholder="owner" oninput="setCtrl(${ix},'owner',this.value)"></td>
+        <td><input class="fld" value="${esc(c.evidence)}" placeholder="evidence / link" oninput="setCtrl(${ix},'evidence',this.value)"></td>
+      </tr>`;
+    });
+  });
+  $("#v-controls").innerHTML=`<div class="card">
+    <div class="card-h"><span class="section-eyebrow">Controls</span><h2>Control Assessment</h2>
+      <span class="note">Effectiveness here drives every mapped risk's residual score</span></div>
+    <div class="tbl-scroll"><table>
+      <thead><tr><th>ID</th><th>Control</th><th>Type / Nature</th><th>Implementation</th><th>Effectiveness</th><th>Owner</th><th>Evidence</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table></div></div>`;
+}
+function setCtrl(ix,k,v){DATA.controls[ix][k]=v;save();renderControls();renderRisks();renderDash();renderMatrix();}
+
+/* ---------- LEGEND / METHODOLOGY ---------- */
+function renderLegend(){
+  const Lscale=[["1 – Rare","Very unlikely within the period"],["2 – Unlikely","Could occur but not expected"],
+    ["3 – Possible","Might occur at some point"],["4 – Likely","Will probably occur in most cases"],["5 – Almost certain","Expected / already occurring"]];
+  const Iscale=[["1 – Insignificant","No real security/data impact"],["2 – Minor","Limited, contained impact"],
+    ["3 – Moderate","Some data/service disruption"],["4 – Major","Significant breach or outage"],["5 – Severe","Critical breach / penalty"]];
+  const bands=[["Critical","15–25","Outside appetite. Immediate remediation & escalation."],
+    ["High","8–14","Action plan with owner & target date required."],
+    ["Medium","4–7","Monitor; remediate where cost-effective."],
+    ["Low","1–3","Within appetite. Accept & monitor."]];
+  $("#v-legend").innerHTML=`<div class="card">
+    <div class="card-h"><span class="section-eyebrow">Reference</span><h2>Scoring &amp; Methodology</h2></div>
+    <div class="legend-grid">
+      <div><h3 style="margin-top:0">Likelihood (L)</h3><table class="mini"><tbody>${Lscale.map(r=>`<tr><td class="mono">${r[0]}</td><td style="color:var(--muted)">${r[1]}</td></tr>`).join("")}</tbody></table></div>
+      <div><h3 style="margin-top:0">Impact (I)</h3><table class="mini"><tbody>${Iscale.map(r=>`<tr><td class="mono">${r[0]}</td><td style="color:var(--muted)">${r[1]}</td></tr>`).join("")}</tbody></table></div>
+    </div>
+    <div class="prose">
+      <h3>Rating bands &nbsp;<span style="font-weight:400;color:var(--faint);font-size:12px">Risk Score = Likelihood × Impact</span></h3>
+      <table class="mini"><tbody>${bands.map(b=>`<tr><td>${ratingPill(b[0])}</td><td class="mono">${b[1]}</td><td style="color:var(--muted)">${b[2]}</td></tr>`).join("")}</tbody></table>
+      <h3>Control-effectiveness weights</h3>
+      <table class="mini"><tbody>
+        <tr><td>${effDot("Effective")}Effective</td><td class="mono">1.0</td></tr>
+        <tr><td>${effDot("Partially Effective")}Partially Effective</td><td class="mono">0.5</td></tr>
+        <tr><td>${effDot("Ineffective")}Ineffective</td><td class="mono">0.0</td></tr>
+        <tr><td>${effDot("Not Tested")}Not Tested</td><td class="mono">0.0</td></tr>
+      </tbody></table>
+      <h3>How residual risk is calculated</h3>
+      <p>For each risk, take its mapped controls, convert each control's live effectiveness to a weight, and average them. That average reduces the inherent ratings:</p>
+      <div class="formula">avg = Σ(control weights) ÷ number of mapped controls
+
+Res. L = round( Inh. L − (Inh. L − 1) × avg )
+Res. I = round( Inh. I − (Inh. I − 1) × avg )
+Res. Score = Res. L × Res. I</div>
+      <p>So improving a control's tested effectiveness anywhere flows automatically into every risk it mitigates — nothing is typed in by hand.</p>
+    </div></div>`;
+}
+
+/* ---------- tabs + boot ---------- */
+const TABS=[["dash","Dashboard"],["risks","Risk Register"],["matrix","Risk–Control Matrix"],["controls","Controls"],["legend","Scoring & Methodology"]];
+function renderTabs(active){
+  $("#tabs").innerHTML=TABS.map(([id,l])=>`<button class="${id===active?'active':''}" onclick="go('${id}')">${l}</button>`).join("");
+  TABS.forEach(([id])=>$("#v-"+id).classList.toggle("active",id===active));
+}
+function go(id){renderTabs(id);location.hash=id;}
+function save(){store(DATA);}
+
+function renderAll(){renderMeta();renderDash();renderRisks();renderMatrix();renderControls();renderLegend();}
+
+/* ---------- export / import / reset ---------- */
+function dl(name,text,type){const b=new Blob([text],{type});const u=URL.createObjectURL(b);
+  const a=document.createElement("a");a.href=u;a.download=name;a.click();URL.revokeObjectURL(u);}
+function exportJSON(){dl("rcsa-data.json",JSON.stringify(DATA,null,2),"application/json");}
+function exportCSV(){
+  const head=["Risk ID","Risk","# Ctrls","Inh L","Inh I","Inh Score","Inh Rating","Avg Eff","Res L","Res I","Res Score","Res Rating","Response","Owner","Status"];
+  const lines=[head.join(",")];
+  DATA.risks.forEach(r=>{const R=residual(r);
+    lines.push([r.id,`"${r.name}"`,r.ctrls.length,r.inhL,r.inhI,R.inhScore,R.inhRating,R.avg.toFixed(2),R.rl,R.ri,R.score,R.rating,r.response,`"${r.owner}"`,r.status].join(","));});
+  dl("rcsa-risk-register.csv",lines.join("\n"),"text/csv");
+}
+function importJSON(){
+  const inp=document.createElement("input");inp.type="file";inp.accept="application/json";
+  inp.onchange=e=>{const f=e.target.files[0];if(!f)return;const rd=new FileReader();
+    rd.onload=()=>{try{DATA=JSON.parse(rd.result);save();renderAll();go(location.hash.slice(1)||"dash");}
+      catch(err){alert("That file couldn't be read as RCSA data.");}};rd.readAsText(f);};
+  inp.click();
+}
+function resetAll(){if(confirm("Reset all entries back to the template defaults?")){DATA=clone(SEED);save();renderAll();go("dash");}}
+
+renderAll();
+go(location.hash.slice(1)||"dash");
+</script>
+</body>
+</html>
