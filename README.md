@@ -19,6 +19,7 @@ backup and **Import** to restore it on another machine. **Export CSV** dumps the
 3. In the repo: **Settings → Pages → Build and deployment → Source: Deploy from a branch**,
    pick `main` / `root`, and Save.
 4. Your app goes live at `https://<your-username>.github.io/sdlc-rcsa/` within a minute or two.
+5. For testing, this link https://hlaingminnpaing.github.io/sdlc-rcsa/#dash can be used.
 
 ## Edit / extend
 
