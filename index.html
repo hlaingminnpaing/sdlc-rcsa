@@ -306,6 +306,13 @@ const SEED={
   ]
 };
 
+/* Template baseline = a fresh / "Reset to template" assessment starts fully un-assessed:
+   every control Not Implemented + Not Tested, every risk at inherent 5×5 (Critical),
+   and each risk's Control Effectiveness Not Tested. SEED above only defines the
+   structure (names, descriptions, types/natures, groups and risk↔control mappings). */
+SEED.controls.forEach(c=>{c.impl="Not Implemented";c.eff="Not Tested";});
+SEED.risks.forEach(r=>{r.inhL=5;r.inhI=5;r.ctrlEff="Not Tested";});
+
 const GROUPS=["Build","Release","Runtime","Lifecycle"];
 const CTRL_TYPES=["Preventive","Detective","Corrective","Preventive & Detective","Detective & Corrective","Preventive & Corrective"];
 const CTRL_NATURES=["Manual","Automated","Hybrid"];
