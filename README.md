@@ -11,16 +11,49 @@ Live Interactive Dashboard: [https://hlaingminnpaing.github.io/sdlc-rcsa/#dash](
 The assessment workspace maps structural development risks against defensive checkpoints across four logical stages of a secure Software Delivery Lifecycle (SDLC):
 
 ```
-                          ┌──────────────────────────┐
-                          │    Secure SDLC Model     │
-                          └─────────────┬────────────┘
-                                        │
-         ┌──────────────────┬───────────┴───────────┬──────────────────┐
-         ▼                  ▼                       ▼                  ▼
-   [ Build Stage ]  [ Release Stage ]       [ Runtime Stage ]  [ Lifecycle Stage ]
-   • Version Ctrl   • Code Reviews          • Change Records   • Role Training
-   • Build Guard    • SAST/SCA/Img          • Gate Controls    • Threat Modeling
-   • SBOM/Firewalls • API/Fuzz Testing      • Drift/Workload   • GenAI Guardrails
+                               ┌──────────────────────────┐
+                               │    Secure SDLC Model     │
+                               └─────────────┬────────────┘
+                                             │
+      ┌──────────────────────┬───────────────┴───────────────┬──────────────────────┐
+      ▼                      ▼                               ▼                      ▼
+┌───────────────┐      ┌───────────────┐               ┌───────────────┐      ┌───────────────┐
+│  BUILD STAGE  │      │ RELEASE STAGE │               │ RUNTIME STAGE │      │LIFECYCLE STAGE│
+└───────┬───────┘      └───────┬───────┘               └───────┬───────┘      └───────┬───────┘
+        │                      │                               │                      │
+        ├── CTRL-0001          ├── CTRL-0007                   ├── CTRL-0012          ├── CTRL-0011
+        │   Version Control    │   Code Review                 │   Change Records     │   Service Ownership
+        │                      │                               │                      │
+        ├── CTRL-0002          ├── CTRL-0008                   ├── CTRL-0013          ├── CTRL-0017
+        │   Artifact Binary    │   Quality Assurance           │   Deployment         │   Training
+        │   Provenance         │                               │   Controls           │                      
+        │                      ├── CTRL-0010                   │                      ├── CTRL-0019
+        ├── CTRL-0003          │   Deployment Approvals        ├── CTRL-0014          │   Penetration Testing
+        │   Controlled Build   │                               │   Secrets Management │                      
+        │   Environment        ├── CTRL-0020                   │                      ├── CTRL-0028
+        │                      │   Vulnerability               ├── CTRL-0015          │   Continuous Threat
+        ├── CTRL-0004          │   Scanning — SAST             │   System Access      │   Modeling & Review
+        │   Dependency         │                               │   Controls           │                      
+        │   Management         ├── CTRL-0021                   │                      └── CTRL-0029
+        │                      │   Vulnerability               ├── CTRL-0016          │   GenAI Code
+        ├── CTRL-0005          │   Scanning — SCA              │   Runtime Workload   │   Assistance Guardrails
+        │   Infrastructure &   │                               │   Monitoring         └──────────────────────┘
+        │   Config as Code     ├── CTRL-0022                   │                      
+        │                      │   Vulnerability               ├── CTRL-0018          
+        ├── CTRL-0006          │   Scanning — Containers       │   Drift Detection    
+        │   Secrets Scanning   │                               │                      
+        │                      ├── CTRL-0023                   └── CTRL-0027          
+        ├── CTRL-0024          │   Feature Flags               │   Post-Commit        
+        │   SBOM Generation    │                               │   Secrets Detection  
+        │   & Attestation      └── CTRL-0030                   │   & Auto-Revocation  
+        │                          Automated API Schema        └──────────────────────┘
+        ├── CTRL-0025              & Contract Verification     
+        │   Dependency Firewall                                
+        │   & Vetted Registries                                
+        │                                                      
+        └── CTRL-0026                                          
+            Infrastructure as Code                            
+            Static Analysis
 ```
 
 ### 1. The 12 Core SDLC Risks
