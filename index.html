@@ -228,7 +228,7 @@ select.ef-NotTested{background:#FFFFFF;color:#2F4DC4;border-color:var(--line)}
     <span class="brand-mark">RCSA</span>
     <div>
       <h1>SDLC Risk &amp; Control Self-Assessment</h1>
-      <div class="sub">9 risks · 22 controls · residual risk driven live by control effectiveness</div>
+      <div class="sub">9 risks · 28 controls · residual risk driven live by control effectiveness</div>
     </div>
     <div class="top-actions">
       <span id="saved" class="saved">saved</span>
@@ -264,12 +264,12 @@ function flashSaved(){const s=document.getElementById("saved");s.classList.add("
 const SEED={
   meta:{org:"",scope:"",period:"",assessor:"",prepared:"",review:""},
   risks:[
-    {id:"RISK-0001",name:"Supply Chain Compromise",desc:"Malicious or tampered components (open-source libraries, base images, build tools, third-party services) enter the SDLC, resulting in compromised applications reaching production.",ctrls:["0002","0003","0004","0013","0016","0020","0021","0022"],inhL:4,inhI:5,response:"Mitigate",owner:"",action:"",status:"Implemented"},
+    {id:"RISK-0001",name:"Supply Chain Compromise",desc:"Malicious or tampered components (open-source libraries, base images, build tools, third-party services) enter the SDLC, resulting in compromised applications reaching production.",ctrls:["0002","0003","0004","0013","0016","0020","0021","0022","0024","0025"],inhL:4,inhI:5,response:"Mitigate",owner:"",action:"",status:"Implemented"},
     {id:"RISK-0002",name:"Insider Threat",desc:"Authorised personnel (or attackers using their credentials) misuse legitimate access to repositories, environments or production to compromise confidentiality, integrity or availability.",ctrls:["0001","0007","0010","0012","0013","0014","0015","0016","0017"],inhL:3,inhI:5,response:"Mitigate",owner:"",action:"",status:"In Progress"},
     {id:"RISK-0003",name:"Unauthorised Deployment",desc:"Software is deployed to production without passing required quality gates, security scans or approval checks.",ctrls:["0002","0010","0013","0016"],inhL:3,inhI:4,response:"Mitigate",owner:"",action:"",status:"In Progress"},
-    {id:"RISK-0004",name:"Credential and Secret Exposure",desc:"Leaked or poorly managed secrets enable unauthorised access to production systems, customer data or pipelines.",ctrls:["0001","0006","0014","0015"],inhL:4,inhI:5,response:"Mitigate",owner:"",action:"",status:"In Progress"},
-    {id:"RISK-0005",name:"Vulnerable Software in Production",desc:"Known vulnerabilities in code or dependencies are exploited in the production environment.",ctrls:["0004","0008","0016","0019","0020","0021","0022"],inhL:4,inhI:4,response:"Mitigate",owner:"",action:"",status:"In Progress"},
-    {id:"RISK-0006",name:"Audit and Compliance Failure",desc:"Inability to evidence controls to regulators, auditors or enterprise customers, resulting in reputational or commercial damage.",ctrls:["0002","0007","0010","0012","0015","0016"],inhL:3,inhI:4,response:"Mitigate",owner:"",action:"",status:"In Progress"},
+    {id:"RISK-0004",name:"Credential and Secret Exposure",desc:"Leaked or poorly managed secrets enable unauthorised access to production systems, customer data or pipelines.",ctrls:["0001","0006","0014","0015","0027"],inhL:4,inhI:5,response:"Mitigate",owner:"",action:"",status:"In Progress"},
+    {id:"RISK-0005",name:"Vulnerable Software in Production",desc:"Known vulnerabilities in code or dependencies are exploited in the production environment.",ctrls:["0004","0008","0016","0019","0020","0021","0022","0026"],inhL:4,inhI:4,response:"Mitigate",owner:"",action:"",status:"In Progress"},
+    {id:"RISK-0006",name:"Audit and Compliance Failure",desc:"Inability to evidence controls to regulators, auditors or enterprise customers, resulting in reputational or commercial damage.",ctrls:["0002","0007","0010","0012","0015","0016","0028","0029"],inhL:3,inhI:4,response:"Mitigate",owner:"",action:"",status:"In Progress"},
     {id:"RISK-0007",name:"Unauthorised System Access",desc:"Production environments are accessed by personnel without appropriate authorisation or full audit trails.",ctrls:["0014","0015"],inhL:3,inhI:5,response:"Mitigate",owner:"",action:"",status:"In Progress"},
     {id:"RISK-0008",name:"Configuration Drift",desc:"Infrastructure or application configuration diverges from its known, approved state, causing undetected changes in security posture or behaviour.",ctrls:["0001","0005","0012","0013","0018"],inhL:4,inhI:3,response:"Mitigate",owner:"",action:"",status:"In Progress"},
     {id:"RISK-0009",name:"Environment Breach",desc:"An external attacker runs unauthorised workloads within the production environment.",ctrls:["0015","0016","0019"],inhL:3,inhI:5,response:"Mitigate",owner:"",action:"",status:"In Progress"}
@@ -296,7 +296,13 @@ const SEED={
     {id:"0018",name:"Drift Detection",obj:"Deviations from the approved, declared state are detected and alerted.",type:"Detective",nature:"Automated",group:"Runtime",impl:"Not Implemented",eff:"Not Tested",owner:"",evidence:""},
     {id:"0017",name:"Training",obj:"Personnel receive security and process training relevant to their role.",type:"Preventive",nature:"Manual",group:"Lifecycle",impl:"Not Implemented",eff:"Not Tested",owner:"",evidence:""},
     {id:"0019",name:"Penetration Testing",obj:"Independent penetration testing periodically identifies exploitable weaknesses.",type:"Detective",nature:"Hybrid",group:"Lifecycle",impl:"Not Implemented",eff:"Effective",owner:"",evidence:""},
-    {id:"0011",name:"Service Ownership",obj:"Every service has a defined owner accountable for its security and operation.",type:"Preventive",nature:"Manual",group:"Lifecycle",impl:"Not Implemented",eff:"Not Tested",owner:"",evidence:""}
+    {id:"0011",name:"Service Ownership",obj:"Every service has a defined owner accountable for its security and operation.",type:"Preventive",nature:"Manual",group:"Lifecycle",impl:"Not Implemented",eff:"Not Tested",owner:"",evidence:""},
+    {id:"0024",name:"Software Bill of Materials (SBOM) Generation & Attestation",obj:"Enforce that every build automatically generates a standard SBOM (e.g., CycloneDX or SPDX format) and cryptographically signs it to prevent tampering.",type:"Preventive & Detective",nature:"Automated",group:"Build",impl:"Not Implemented",eff:"Partially Effective",owner:"",evidence:""},
+    {id:"0025",name:"Dependency Firewall & Vetted Registries",obj:"Restrict CI/CD runners from pulling packages directly from public registries without routing through a proxy that blocks malicious or unvetted packages.",type:"Preventive",nature:"Automated",group:"Build",impl:"Not Implemented",eff:"Effective",owner:"",evidence:""},
+    {id:"0026",name:"Infrastructure as Code (IaC) Static Analysis",obj:"Automated pre-deployment security scanning of cloud configuration files (Terraform templates, Helm charts, Kubernetes manifests) to catch misconfigurations before deployment.",type:"Preventive",nature:"Automated",group:"Build",impl:"Not Implemented",eff:"Ineffective",owner:"",evidence:""},
+    {id:"0027",name:"Post-Commit Secrets Detection & Auto-Revocation",obj:"Active background monitors continuously check code repositories for leaked secrets and automatically trigger alert/rotation sequences if an accidental merge occurs.",type:"Corrective",nature:"Automated",group:"Runtime",impl:"Not Implemented",eff:"Partially Effective",owner:"",evidence:""},
+    {id:"0028",name:"Continuous Threat Modeling & Architecture Review",obj:"For major releases or structural API changes, a formal threat-modeling exercise (e.g., STRIDE) must be documented and approved before engineering work begins.",type:"Preventive",nature:"Manual",group:"Lifecycle",impl:"Not Implemented",eff:"Not Tested",owner:"",evidence:""},
+    {id:"0029",name:"GenAI Code Assistance Guardrails",obj:"Ensure code generated by AI assistants (GitHub Copilot, Cursor) passes identical SAST/SCA gates as human code; policies prohibit pasting sensitive customer data or credentials into external LLMs.",type:"Preventive",nature:"Manual",group:"Lifecycle",impl:"Not Implemented",eff:"Ineffective",owner:"",evidence:""}
   ]
 };
 
@@ -313,7 +319,16 @@ const EFF_WEIGHT={"Effective":1,"Partially Effective":0.5,"Ineffective":0,"Not T
 let DATA=clone(load()||SEED);
 normalizeData();
 function clone(o){return JSON.parse(JSON.stringify(o));}
-function normalizeData(){normalizeCtrls();normalizeRisks();}
+function normalizeData(){migrateControls();normalizeCtrls();normalizeRisks();}
+/* merge controls/mappings added in template updates into existing saved data */
+function migrateControls(){
+  const added=[];
+  SEED.controls.forEach(sc=>{ if(!DATA.controls.some(c=>c.id===sc.id)){ DATA.controls.push(clone(sc)); added.push(sc.id); } });
+  if(added.length){
+    SEED.risks.forEach(sr=>{ const dr=DATA.risks.find(r=>r.id===sr.id); if(!dr)return;
+      sr.ctrls.forEach(cid=>{ if(added.includes(cid)&&!dr.ctrls.includes(cid)) dr.ctrls.push(cid); }); });
+  }
+}
 function normalizeCtrls(){DATA.controls.forEach(c=>{if(c.action==null)c.action="";if(c.target==null)c.target="";if(c.status==null)c.status="To Do";});}
 function normalizeRisks(){DATA.risks.forEach(r=>{if(r.ctrlEff==null)r.ctrlEff="Not Tested";if(r.actionOwner==null)r.actionOwner="";if(r.target==null)r.target="";});}
 function ctrlById(id){return DATA.controls.find(c=>c.id===id);}
