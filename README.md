@@ -24,3 +24,13 @@ backup and **Import** to restore it on another machine. **Export CSV** dumps the
 
 Everything lives in `index.html`. The seed data is the `SEED` object near the top of the
 `<script>` block — adjust risks, controls, mappings, or scoring weights there.
+
+readme_content = """# Secure SDLC Risk & Control Self-Assessment (RCSA) Template
+
+An automated, data-driven **Risk & Control Self-Assessment (RCSA)** framework aligned to the **Kosli Secure SDLC model**. This template separates risks from controls, mapping them via a central matrix where residual risk scores are automatically calculated based on the assessed effectiveness of underlying controls.
+
+---
+
+## 📋 Overview & Model Structure
+
+The framework encapsulates the entire software delivery lifecycle across **9 Core SDLC Risks** and **22 Security Controls** distributed across four key stages:
