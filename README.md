@@ -156,11 +156,4 @@ This framework is built to be an evolving, living repository.
 ---
 *Disclaimer: Ensure control definitions are audited against your production infrastructure, CI/CD orchestrators, and internal security policies before finalizing quarterly risk signs-offs.*
 
-README.md
-Displaying README.md.
-
 ---
-
-## 📋 Overview & Model Structure
-
-The framework encapsulates the entire software delivery lifecycle across **9 Core SDLC Risks** and **22 Security Controls** distributed across four key stages:
