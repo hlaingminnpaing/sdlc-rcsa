@@ -25,47 +25,6 @@ backup and **Import** to restore it on another machine. **Export CSV** dumps the
 Everything lives in `index.html`. The seed data is the `SEED` object near the top of the
 `<script>` block — adjust risks, controls, mappings, or scoring weights there.
 
- Gemini
-New chat
-Search chats
-Images New
-Videos
-Library
-New notebook
-Please review my attached document and please write the Readme.md for my github to understand the users how to use my RCSA template.
-Modernizing RCSA Controls for SDLC
-엄마라고 불러주세요
-အခု သိချင်တဲ့ မေးခွန်းရှိတယ်ပေါ့နော်။ အဲ့ဒီမေးခွန်းက ဘာလဲဆိုလို့ရှိရင် အခုလက်ရှိကြုံနေရတဲ့ ဝတ်ကြွေးတွေ၊ ကံကြွေးတွေ၊ အဆင်မပြေဘဲနဲ့ စိတ်ဆင်းရဲ၊ ကိုယ်ဆင်းရဲဖြစ်နေတယ်၊ စိတ်ဆင်းရဲရတာပေါ့နော်။ စိတ်ဆင်းရဲပြီးတော့ ထွက်ပေါက်ပိတ်ပြီးတော့ ဖြစ်နေတဲ့ အဆင်မပြေတဲ့ကိစ္စတွေပေါ့နော်။ ဒီကိစ္စတွေ အရမ်းစိတ်ဖိစီးမှုဖြစ်နေတဲ့ဟာတွေကို ဘယ်တော့ အဝတ်ကြွေးကြောင့်ပေါ့နော်။ အတိတ်ဝတ်ကြွေးကြောင့် ကြုံနေရတဲ့ဟာတွေပေါ့နော်။ ဒီအတိတ်ဝတ်ကြွေးတွေ ရှိခဲ့တယ်ဆိုလို့ရှိရင် ဒီ အတိတ်ဝတ်ကြွေးတွေ က ဘယ်တော့မှ ပြီးဆုံးမလဲဆိုတဲ့ဟာကို သဲရွေ့လိုက်တယ်။ သဲရွေ့လိုက်တော့ ဆွဲလိုက်တဲ့ သဲရွေ့ကပ်လေးကပ်ကျတယ်။ the gut가 the herofan herofan ပြောင်းပြန် နောက်တစ်ခုက ace of pentacles အသည်း ပြီးလို့ရှိရင် three of wands က ပြောင်းပြန် နောက်ပြီးရင် the wall the wall ကပ်က အောက်က button ကပ်က ကျတော့ fight or swap ပြောင်းပြန်ဖြစ်နေတယ်။ အဲ့ဒါ အဓိပ္ပာယ် ပြောပြပေးပါဦး။
-Correcting Contract Completion Question
-HR Screening Call Preparation Guide
-Chord Sheet Updated to D Major
-အနောက်တိုင်း နက္ခ ဗေဒ ပညာ ရပ်ကိုအသုံးပြုပြီးတော့ မြန်မာနိုင်ငံရဲ့ စီးပွါးရေး နျုင်ငံရေး အခြေအနေကို နောက် ၄ နှစ်စာဟောပြပေးပါ ၂၀၂၆ မှ ၂၀၃၀ အထိ
-Refining LinkedIn Post for RCSA Templates
-Please provide the RCSA for SDLC template using the ISO 27001, NIST SSDF (SP 800-218), OWASP SAMM & Top 10 for security and NIST RMF for risk. Please add this elements "A robust RCSA SDLC template should track: SDLC Phase: (Planning, Requirement Analysis, Design, Development, Testing, Deployment, Maintenance). Inherent Risk: The risk exposure if no controls are in place. Key Controls: Preventive, detective, and corrective controls (e.g., automated SAST, peer reviews, CI/CD pipelines). Residual Risk: The remaining risk after control effectiveness is rated. Control Owners & Action Plans: Named personnel tasked with bridging control gaps. [1, 2, 3, 4]". The template use for the software development company they use the DevOps culture. Please provide with the Microsoft excel format.
-Major Arcana ကတ်ကြီး ၂၂ ကတ် အဓိပ္ပာယ်
-CV Assessment for Information Security Role
-ATOM မှာ အလုပ်လျှောက်ထားတာ အလုပ်ရမှာလား ဆိုတာကို မေးဖို့အတွက် တားရော့ ဆွဲတာမှာ The Empress ကဒ် ကျပါတယ် Bottom Card အနေနဲ့ကတော့ 10 of Cups ဖြစ်ပါတယ် ဘာသာပြန်ပေးပါ attached တွဲထားတဲ့ စာအုပ်ကို မှီငြမ်းပြီးပြောပြပေးပါ
-my date of birth is 24,08,1988. time of birth is 7:35 am morning and place of birth is Yangon city in Myanmar, which located at 16.785017644183675, 96.13565003522056. make a natal chart for me. Please tell me in Burmese.
-Thai Lottery Results and Ticket Check
-Bangkok Salary, Tax, and Living Costs
-Thailand PDPA: Key Provisions and Rights
-Analyzing "Boulevard of Broken Dreams" Lyrics
-လက်သည်းနီ နှုတ်ခမ်းနီ မိတ်ကပ်တွေ သုံးတာ ကလေးကို စောစောစီးစီး အပျို ဖော်ဝင်စေတယ်ဆိုတာဟုတ်လား
-Meaning of "As of Now"
-Here are clear images of my palms. Give me a detailed breakdown of the major lines (life, heart, head, fate) and any special marks you see. Provide insights into my personality, health, relationships, and career based on palmistry traditions. Especially what is my career and wealth after 37 years old. Please tell me in Burmese.
-Clarifying "the AAISM" Usage
-Please explain me Burmese language for this three major tarot cards. II. The High Priestess – Intuition, the subconscious, and hidden knowledge III. The Empress – Abundance, fertility, and the nurturing energy of nature IV. The Emperor – Structure, authority, and stability. The explanation must be used from the book that is attached in attachment.
-Conversation with Gemini
-
-Please review my attached document and please write the Readme.md for my github to understand the users how to use my RCSA template.
-Python
-
-readme_content = """# Secure SDLC Risk & Control Self-Assessment (RCSA) Template
-
-An automated, data-driven **Risk & Control Self-Assessment (RCSA)** framework aligned to the **Kosli Secure SDLC model**. This template separates risks from controls, mapping them via a central matrix where residual risk scores are automatically calculated based on the assessed effectiveness of underlying controls.
-
----
-
 ## 📋 Overview & Model Structure
 
 The framework encapsulates the entire software delivery lifecycle across **9 Core SDLC Risks** and **22 Security Controls** distributed across four key stages:
