@@ -1,40 +1,14 @@
-# SDLC RCSA — Web Edition
-
-A single-file web version of the SDLC Risk &amp; Control Self-Assessment template
-(adapted from the Kosli secure-SDLC reference model). No build step, no server.
-
-- **Risk Register** — edit inherent Likelihood &amp; Impact; residual risk is calculated automatically.
-- **Risk–Control Matrix** — the risk↔control mapping.
-- **Controls** — set implementation status &amp; effectiveness; this drives every mapped risk's residual score.
-- **Dashboard** — live residual heat map and posture breakdown.
-- **Scoring &amp; Methodology** — the 1–5 scales, rating bands, and the residual formula.
-
-Entries are saved in your browser (localStorage). Use **Export data** to keep a JSON
-backup and **Import** to restore it on another machine. **Export CSV** dumps the risk register.
-
-## Deploy to GitHub Pages (free)
-
-1. Create a new repository on GitHub (e.g. `sdlc-rcsa`).
-2. Add `index.html` (and this README) and commit to the `main` branch.
-3. In the repo: **Settings → Pages → Build and deployment → Source: Deploy from a branch**,
-   pick `main` / `root`, and Save.
-4. Your app goes live at `https://<your-username>.github.io/sdlc-rcsa/` within a minute or two.
-5. For testing, this link https://hlaingminnpaing.github.io/sdlc-rcsa/#dash can be used.
-
-## Edit / extend
-
-Everything lives in `index.html`. The seed data is the `SEED` object near the top of the
-`<script>` block — adjust risks, controls, mappings, or scoring weights there.
-
 # Secure SDLC Risk & Control Self-Assessment (RCSA) Template
 
-An automated, data-driven **Risk & Control Self-Assessment (RCSA)** framework aligned to the **Kosli Secure SDLC model**. This template separates risks from controls, mapping them via a central matrix where residual risk scores are automatically calculated based on the assessed effectiveness of underlying controls. First, I created an Excel template based on the Kosli Secure SDLC model. Because the original Kosli RCSA template separates the risk register from the controls, I modified it by adding six new controls and linking them directly to the Risk Register alongside their control statuses and then I convert the template to web app. The original Excel template is uploaded as well.
+An automated, data-driven **Risk & Control Self-Assessment (RCSA)** framework aligned to the **Kosli Secure SDLC model**. This template separates risks from controls, mapping them via a central matrix where residual risk profiles are automatically derived from the evaluated effectiveness of underlying engineering and lifecycle controls.
+
+Live Interactive Dashboard: [https://hlaingminnpaing.github.io/sdlc-rcsa/#dash](https://hlaingminnpaing.github.io/sdlc-rcsa/#dash)
 
 ---
 
-## 📋 Overview & Model Structure
+## 📋 Overview & Core Architecture
 
-The framework encapsulates the entire software delivery lifecycle across **9 Core SDLC Risks** and **22 Security Controls** distributed across four key stages:
+The assessment workspace maps structural development risks against defensive checkpoints across four logical stages of a secure Software Delivery Lifecycle (SDLC):
 
 ```
                           ┌──────────────────────────┐
@@ -44,117 +18,150 @@ The framework encapsulates the entire software delivery lifecycle across **9 Cor
          ┌──────────────────┬───────────┴───────────┬──────────────────┐
          ▼                  ▼                       ▼                  ▼
    [ Build Stage ]  [ Release Stage ]       [ Runtime Stage ]  [ Lifecycle Stage ]
-   • Version Ctrl   • Code Review           • Change Records   • Role Training
-   • Provenance     • QA Testing            • Deploy Controls  • Pen Testing
-   • Hardened CI    • SAST / SCA / Img      • Secrets Mgmt     • Ownership
-   • SBOM / IaC     • Deploy Approvals      • Least-Privilege  • GenAI Guardrails
+   • Version Ctrl   • Code Reviews          • Change Records   • Role Training
+   • Build Guard    • SAST/SCA/Img          • Gate Controls    • Threat Modeling
+   • SBOM/Firewalls • API/Fuzz Testing      • Drift/Workload   • GenAI Guardrails
 ```
 
-### The 9 Core Risks
-1. **RISK-0001: Supply Chain Compromise** (Mitigated by: Artifact Provenance, Dependency Firewall, SCA, etc.)
-2. **RISK-0002: Insider Threat** (Mitigated by: Version Control, Code Review, Deployment Approvals, System Access Controls)
-3. **RISK-0003: Unauthorised Deployment** (Mitigated by: Binary Provenance, Deployment Approvals & Controls, Workload Monitoring)
-4. **RISK-0004: Credential and Secret Exposure** (Mitigated by: Pre-commit Secrets Scanning, Secrets Management, Auto-Revocation)
-5. **RISK-0005: Vulnerable Software in Production** (Mitigated by: Dependency Management, QA, SAST, SCA, Container Scans, IaC Analysis)
-6. **RISK-0006: Audit and Compliance Failure** (Mitigated by: Artifact Provenance, Code Review, Change Records, GenAI Guardrails)
-7. **RISK-0007: Unauthorised System Access** (Mitigated by: Secrets Management, System Access Controls)
-8. **RISK-0008: Configuration Drift** (Mitigated by: Version Control, IaC, Change Records, Deployment Controls, Drift Detection)
-9. **RISK-0009: Environment Breach** (Mitigated by: System Access Controls, Runtime Workload Monitoring, Penetration Testing)
+### 1. The 12 Core SDLC Risks
+*   **RISK-0001: Supply Chain Compromise** – Malicious or tampered components (open-source libraries, base images, build tools, third-party services) enter the SDLC, resulting in compromised applications reaching production.
+*   **RISK-0002: Insider Threat** – Authorised personnel (or attackers using their credentials) misuse legitimate access to repositories, environments or production to compromise confidentiality, integrity or availability.
+*   **RISK-0003: Unauthorised Deployment** – Software is deployed to production without passing required quality gates, security scans or approval checks.
+*   **RISK-0004: Credential and Secret Exposure** – Leaked or poorly managed secrets enable unauthorised access to production systems, customer data or pipelines.
+*   **RISK-0005: Vulnerable Software in Production** – Known vulnerabilities in code or dependencies are exploited in the production environment.
+*   **RISK-0006: Audit and Compliance Failure** – Inability to evidence controls to regulators, auditors or enterprise customers, resulting in reputational or commercial damage.
+*   **RISK-0007: Unauthorised System Access** – Production environments are accessed by personnel without appropriate authorisation or full audit trails.
+*   **RISK-0008: Configuration Drift** – Infrastructure or application configuration diverges from its known, approved state, causing undetected changes in security posture or behaviour.
+*   **RISK-0009: Environment Breach** – An external attacker runs unauthorised workloads within the production environment.
+*   **RISK-0010: GenAI & Code Assistant Exploitation** – Developers using unvetted public LLMs or autonomous AI coding agents introduce package hallucinations, unauthorized license liabilities, or inadvertently leak proprietary source code/secrets into public models.
+*   **RISK-0011: Insecure Infrastructure as Code (IaC)** – Cloud deployment configurations, container orchestration manifest files (Terraform, Helm charts, Kubernetes YAML), or environment parameters contain systemic access-control vulnerabilities or overly permissive IAM footprints committed directly into the code.
+*   **RISK-0012: Insecure Architectural Design** – Core functional flaws in application logic, business processing flows, data tenancy boundaries, or upstream API design contracts are introduced during early product specification phases, passing downstream syntactical pipeline scans undetected.
 
 ---
 
-## 🗂️ Workbook Architecture
+## 🛠️ The 29 Security Controls Grid
 
-The template contains the following interconnected worksheets. Work through them in this general order:
+Controls are cataloged by their point of execution. Each control is explicitly cross-referenced inside the `Risk-Control Matrix` tab.
 
-| Tab Name | Role & Purpose |
-| :--- | :--- |
-| **`Instructions`** | Quick-start guidance for new users and onboarding info. |
-| **`Dashboard`** | High-level summary view aggregating residual risk counts, risk heatmaps, and control coverage. |
-| **`Risk Register`** | The master list where assessors input inherent risks and view live formula-driven residual risk ratings. |
-| **`Risk-Control Matrix`** | A matrix grid mapping controls (`CTRL`) to risks (`RISK`) using an `X` relationship indicator. |
-| **`Build / Release / Runtime / Lifecycle`** | Four distinct stage inventories to track control implementation status, effectiveness ratings, and evidence. |
-| **`Scoring Legend`** | Defines 1–5 qualitative scales, the 5x5 heatmap matrix, and underlying math weights. |
-| **`Definitions`** | A deep-dive data dictionary explaining columns, allowed statuses, and workflows. |
-| **`Model Reference`** | Static reference library maintaining the baseline Secure SDLC taxonomy. |
+### Build Controls (9 Checkpoints)
+*   **CTRL-0001: Version Control** – All source code and configuration is managed in version control with full, traceable history.
+*   **CTRL-0002: Artifact Binary Provenance** – Build artifacts are traceable to their source commit and build; provenance is attested and verifiable.
+*   **CTRL-0003: Controlled Build Environment** – Builds run in a controlled, reproducible environment using approved, hardened toolchains.
+*   **CTRL-0004: Dependency Management** – Third-party and open-source dependencies are inventoried, approved and kept current; SBOM maintained.
+*   **CTRL-0005: Infrastructure and Configuration as Code** – Infrastructure and configuration are defined as code, version-controlled and peer-reviewed.
+*   **CTRL-0006: Secrets Scanning** – Code and artifacts are scanned to detect secrets/credentials before reaching shared repositories.
+*   **CTRL-0024: Software Bill of Materials (SBOM) Generation & Attestation** – Enforce that every build automatically generates a standard SBOM (e.g., CycloneDX or SPDX format) and cryptographically signs it to prevent tampering.
+*   **CTRL-0025: Dependency Firewall & Vetted Registries** – Restrict CI/CD runners from pulling packages directly from public registries without routing through a proxy that blocks malicious or unvetted packages.
+*   **CTRL-0026: Infrastructure as Code (IaC) Static Analysis** – Automated pre-deployment security scanning of cloud configuration files (Terraform templates, Helm charts, Kubernetes manifests) to catch misconfigurations before deployment.
 
----
+### Release Controls (8 Checkpoints)
+*   **CTRL-0007: Code Review** – Changes are peer-reviewed and approved before being merged or released.
+*   **CTRL-0008: Quality Assurance** – Automated and manual testing validates functionality and quality before release.
+*   **CTRL-0020: Vulnerability Scanning — SAST** – Static application security testing detects code-level vulnerabilities before release.
+*   **CTRL-0021: Vulnerability Scanning — SCA** – Software composition analysis detects vulnerable dependencies before release.
+*   **CTRL-0022: Vulnerability Scanning — Containers** – Container images are scanned for vulnerabilities before release.
+*   **CTRL-0010: Deployment Approvals** – Production deployments require defined approvals and must pass required gates.
+*   **CTRL-0023: Feature Flags** – Functionality is controlled via feature flags to enable safe, reversible release.
+*   **CTRL-0030: Automated API Schema & Contract Verification** – Validate live staging application network interfaces against strict OpenAPI schemas and execute automated behavioral fuzz tests to discover object-level authorization vulnerabilities.
 
-## ⚙️ How the Scoring Methodology Works
+### Runtime Controls (7 Checkpoints)
+*   **CTRL-0012: Change Records** – Every production change is captured in a traceable, auditable change record.
+*   **CTRL-0013: Deployment Controls** – Only verified, approved artifacts can be deployed; deployment mechanisms are controlled.
+*   **CTRL-0014: Secrets Management** – Runtime secrets are stored, rotated and accessed through a managed secrets solution.
+*   **CTRL-0015: System Access Controls** – Production access is least-privilege, authenticated, time-bound and logged.
+*   **CTRL-0016: Runtime Workload Monitoring** – Running workloads are monitored to detect anomalous or unauthorised activity.
+*   **CTRL-0018: Drift Detection** – Deviations from the approved, declared state are detected and alerted.
+*   **CTRL-0027: Post-Commit Secrets Detection & Auto-Revocation** – Active background monitors continuously check code repositories for leaked secrets and automatically trigger alert/rotation sequences if an accidental merge occurs.
 
-Unlike legacy assessments where residual risk is estimated manually, this model uses an **automated, control-driven mathematical reduction engine**.
-
-### 1. Inherent Risk Rating
-Assessors define the raw, unmitigated hazard level by assigning scores on two 1–5 axes:
-* **Likelihood (L):** 1 (Rare) to 5 (Almost Certain)
-* **Impact (I):** 1 (Insignificant) to 5 (Severe)
-* $	ext{Inherent Score} = 	ext{Inherent L} 	imes 	ext{Inherent I}$ (Range: 1 to 25)
-  * **Critical:** 15–25
-  * **High:** 8–14
-  * **Medium:** 4–7
-  * **Low:** 1–3
-
-### 2. Control Effectiveness Weighting
-Every control mapped to a risk on the **Risk-Control Matrix** is assigned a mathematical credit based on its assessed health:
-* **Effective:** `1.0` (Full mitigation credit)
-* **Partially Effective:** `0.5` (50% mitigation credit)
-* **Ineffective:** `0.0` (No credit)
-* **Not Tested:** `0.0` (Conservative safety default)
-
-### 3. Automated Residual Risk Calculation
-The model calculates the **Average Control Effectiveness ($	ext{Avg Ctrl Eff}$)** for all controls explicitly mapped to that specific risk. The residual parameters are then derived as:
-
-$$	ext{Residual L} = 	ext{ROUND}\left( 	ext{Inherent L} - (	ext{Inherent L} - 1) 	imes 	ext{Avg Ctrl Eff},\, 0 
-ight)$$
-$$	ext{Residual I} = 	ext{ROUND}\left( 	ext{Inherent I} - (	ext{Inherent I} - 1) 	imes 	ext{Avg Ctrl Eff},\, 0 
-ight)$$
-$$	ext{Residual Score} = 	ext{Residual L} 	imes 	ext{Residual I}$$
-
-> 💡 **Behavior:** If all mapped controls are 100% **Effective**, the residual metrics scale completely down to the floor value of `1`. If no controls are effective or remain untested, the residual risk stays perfectly equal to its raw inherent risk score.
+### Lifecycle Controls (5 Checkpoints)
+*   **CTRL-0017: Training** – Personnel receive security and process training relevant to their role.
+*   **CTRL-0019: Penetration Testing** – Independent penetration testing periodically identifies exploitable weaknesses.
+*   **CTRL-0011: Service Ownership** – Every service has a defined owner accountable for its security and operation.
+*   **CTRL-0028: Continuous Threat Modeling & Architecture Review** – For major releases or structural API changes, a formal threat-modeling exercise (e.g., STRIDE) must be documented and approved before engineering work begins.
+*   **CTRL-0029: GenAI Code Assistance Guardrails** – Ensure code generated by AI assistants (GitHub Copilot, Cursor) passes identical SAST/SCA gates as human code; policies prohibit pasting sensitive customer data or credentials into external LLMs.
 
 ---
 
-## 🚀 Operating Guide: Step-by-Step Workflow
+## 🗂️ Workbook Architecture & Navigation
 
-To conduct an assessment cycle using the template, follow these guidelines:
+The `SDLC_RCSA_Template.xlsx` sheet structures tasks across specialized tabs:
 
-### Step 1: Initialize Setup
-Complete the metadata section on the cover sheet:
-* Identify the **Organization / Product** and **In-scope services/systems**.
-* Document the **Assessment period**, **Risk Owner / Assessor**, and set your **Next review due** date.
+| Tab Name | Group Category | Purpose | Operational Input Type |
+| :--- | :--- | :--- | :--- |
+| **`Instructions`** | Guidance | Quick-start playbook for engineering managers. | Read-Only |
+| **`Dashboard`** | Executive Reporting | Heatmap matrices and control coverage aggregations. | Auto-Generated |
+| **`Risk Register`** | Threat Profiling | Active master register tracking inherent vs residual scores. | **Blue Text Fields** |
+| **`Risk-Control Matrix`**| Mapping Grid | Intersecting matrix defining control-to-risk alignments. | **`X` Markers** |
+| **`Build Controls`** | Phase 1 Assessment | Operational inventory for CI pipeline configuration. | **Status & Effectiveness** |
+| **`Release Controls`** | Phase 2 Assessment | Operational inventory for CD pipeline gates. | **Status & Effectiveness** |
+| **`Runtime Controls`** | Phase 3 Assessment | Operational inventory for infrastructure protection. | **Status & Effectiveness** |
+| **`Lifecycle Controls`**| Phase 4 Assessment | Governance, training, and architectural reviews. | **Status & Effectiveness** |
+| **`Scoring Legend`** | Core Engine | Heatmap thresholds, impact bounds, and math weights. | Reference / Custom |
+| **`Definitions`** | Glossary | Data dictionary explaining formatting conventions. | Reference |
+| **`Model Reference`** | Core Taxonomy | Master library tracking reference secure SDLC goals. | Reference |
+| **`Methodology`** | System Documentation| Algorithmic approach defining automated calculations. | Reference |
 
-### Step 2: Establish the Inherent Baseline
-1. Open the **`Risk Register`** tab.
-2. Review the 9 pre-loaded SDLC risks.
-3. Complete the **blue text inputs** for **Inherent Likelihood** and **Inherent Impact**. Assume absolutely zero security controls are functioning when assigning these values.
+---
 
-### Step 3: Grade Your Security Controls
-1. Navigate across the four control stage tabs (**Build**, **Release**, **Runtime**, **Lifecycle**).
-2. For each control, update the following fields:
-   * **Implementation Status:** `Implemented` or `Not Implemented`.
-   * **Control Effectiveness:** Select `Effective`, `Partially Effective`, `Ineffective`, or `Not Tested`.
-   * **Evidence Reference:** Paste documentation links, CI/CD YAML paths, architecture diagrams, or audit logging queries to prove the rating.
-   * **Control Owner:** Assign a specific platform, security, or engineering stakeholder.
+## ⚙️ Mathematical Risk Scoring Methodology
 
-### Step 4: Map Relationships
-If you customize or add a control relationship, go to the **`Risk-Control Matrix`** tab and log an `X` at the intersecting cell. The template will automatically adjust the calculated `# Ctrls` and `Avg Ctrl Eff` properties.
+Residual scores update programmatically based on actual measured control conditions, removing manual bias from assessments.
 
-### Step 5: Address Risk Appetite Violations
-1. Review the final calculated metrics on the **`Dashboard`** and **`Risk Register`**.
-2. **Critical Directive:** Any residual risk rating evaluating to **High** or **Critical** is automatically flagged as outside organizational risk appetite.
-3. For these gaps, the risk owner must formulate an active remediation blueprint within the **Action Plan** columns, defining clear milestones, remediation owners, and target resolution dates.
+### 1. Inherent Risk Profiling
+Assessors define baseline threat levels by evaluating worst-case exposure using a qualitative 1–5 scale:
+*   **Likelihood ($L$):** `1` (Rare) to `5` (Almost Certain)
+*   **Impact ($I$):** `1` (Insignificant) to `5` (Severe)
+*   $$\text{Inherent Score} = \text{Inherent } L \times \text{Inherent } I \quad \text{(Bounds: 1 to 25)}$$
+
+### 2. Control Credit Weights
+Control scoring evaluates execution status to prevent inflation before verification:
+*   **Effective:** `1.0` (Full mitigation credit)
+*   **Partially Effective:** `0.5` (50% risk reduction weight)
+*   **Ineffective / Not Tested:** `0.0` (Zero defensive value credited)
+
+### 3. Formula-Driven Residual Risk
+The sheet aggregates weights for all controls mapped to a threat inside the `Risk-Control Matrix` to find the **Average Control Effectiveness ($\text{Avg Ctrl Eff}$)**. Residual values are derived as:
+
+$$\text{Residual } L = \text{ROUND}\left( \text{Inherent } L - (\text{Inherent } L - 1) \times \text{Avg Ctrl Eff},\, 0 \right)$$
+$$\text{Residual } I = \text{ROUND}\left( \text{Inherent } I - (\text{Inherent } I - 1) \times \text{Avg Ctrl Eff},\, 0 \right)$$
+$$\text{Residual Score} = \text{Residual } L \times \text{Residual } I$$
+
+> 📊 **Engine Behavior:** If all mapped controls are fully **Effective**, residual risk reduces directly to its floor score of `1`. If controls are broken, missing, or undocumented, the residual risk retains its maximum inherent score.
+
+---
+
+## 🚀 Step-by-Step Operating Guide
+
+### Step 1: Baseline Context Setup
+Open the spreadsheet and fill out the metadata section on the front page: Define the **Organization / Product**, targeted **In-scope services/systems**, and the **Assessment period**.
+
+### Step 2: Inherent Threat Assessment
+1. Navigate to the **`Risk Register`** tab.
+2. Review the 12 pre-loaded software supply chain risks.
+3. Edit only the **blue text columns** for `Inh. L` and `Inh. I`. Evaluate the threat assuming no pipelines or firewalls are running.
+
+### Step 3: Operational Control Grading
+1. Move across the four phase trackers (**Build Controls**, **Release Controls**, **Runtime Controls**, **Lifecycle Controls**).
+2. For each checkpoint item, provide operational inputs:
+    *   **Implementation Status:** Select `Implemented`, `Partially Implemented`, or `Not Implemented`.
+    *   **Control Effectiveness:** Grade as `Effective`, `Partially Effective`, `Ineffective`, or `Not Tested`.
+    *   **Evidence / Reference:** Document specific validation proof (e.g., *Link to SonarQube profile*, *Repo branch protection settings*, *AWS KMS key rotation policies*).
+
+### Step 4: Map Intersections
+If you implement local workarounds or tailor threat coverages, map relationship links on the **`Risk-Control Matrix`** by adding an `X` to the coordinate cell. This automatically adjusts target calculations.
+
+### Step 5: Remediate Appetite Gaps
+1. Monitor the live results on your **`Dashboard`** or web viewer.
+2. Any calculated residual rating evaluating to **High** or **Critical** requires active mitigation.
+3. Use the **Action Plan** columns to document specific remediation blueprints, assign owners, and track target completion deadlines.
 
 ---
 
 ## 🛠️ Customization & Maintenance
 
-This framework is built to be an evolving, living repository.
+*   **Adding New Risks:** Append a row to the bottom of the `Risk Register` and a corresponding row inside the `Risk-Control Matrix`. Extend formulas down for `Avg Ctrl Eff` and residual scores.
+*   **Adding Tailored Checkpoints:** Insert a column inside the `Risk-Control Matrix` grid and append a tracking row into its respective lifecycle tab.
+*   **Modifying Calibration:** Adjust structural weights or risk appetite rating boundaries entirely inside the `Scoring Legend` tab without breaking formulas.
 
-* **To Add a New Risk:** Append a row to the `Risk Register` and a corresponding row inside the `Risk-Control Matrix`. Copy the underlying formulas for `Avg Ctrl Eff` and residual scores downwards.
-* **To Add a Tailored Control:** Add a column to the `Risk-Control Matrix` and a matching tracker row inside its corresponding stage tab (`Build`, `Release`, etc.).
-* **To Modify Weightings:** Open the `Scoring Legend` tab and alter the numerical mappings assigned to effectiveness properties. All formulas across the workbook dynamically reference these cells.
-
----
-*Disclaimer: Ensure control definitions are audited against your production infrastructure, CI/CD orchestrators, and internal security policies before finalizing quarterly risk signs-offs.*
-
----
+***
+*Disclaimer: This self-assessment framework represents a snapshot of your SDLC posture. Definitions and mappings should be verified against active cloud architecture blueprints, branch configurations, and organizational compliance mandates quarterly.*
