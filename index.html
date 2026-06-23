@@ -9,16 +9,17 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;450;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#F6F7F9; --surface:#FFFFFF; --surface-2:#FBFCFD;
-  --ink:#16202E; --muted:#5B6B7E; --faint:#8C9AAB;
-  --line:#E4E8EE; --line-strong:#CdD5DF;
-  --brand:#2F4DC4; --brand-soft:#EAEEFB;
-  --crit:#B42318; --crit-bg:#FDEAE7;
-  --high:#B54708; --high-bg:#FDF0DC;
-  --med:#9A7400;  --med-bg:#FCF6D8;
-  --low:#067647;  --low-bg:#DCF6E8;
-  --eff:#067647; --part:#9A7400; --ineff:#B42318; --nt:#7A8696;
-  --shadow:0 1px 2px rgba(16,32,46,.05),0 8px 24px -16px rgba(16,32,46,.18);
+  /* Dark theme — UI only; all data + calculations unchanged */
+  --bg:#0E1116; --surface:#171C24; --surface-2:#1E242E;
+  --ink:#E7ECF3; --muted:#9AA7B6; --faint:#6E7C8C;
+  --line:#2A323D; --line-strong:#3C4654;
+  --brand:#7C9CFF; --brand-soft:rgba(124,156,255,.16);
+  --crit:#FF7A7A; --crit-bg:#3A2024;
+  --high:#FFB266; --high-bg:#3A2B1A;
+  --med:#F2D45C;  --med-bg:#332E16;
+  --low:#4ADE9A;  --low-bg:#16302A;
+  --eff:#4ADE9A; --part:#F2D45C; --ineff:#FF7A7A; --nt:#8A97A8;
+  --shadow:0 1px 2px rgba(0,0,0,.45),0 14px 34px -18px rgba(0,0,0,.75);
 }
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -220,6 +221,35 @@ select.ef-NotTested{background:#FFFFFF;color:#2F4DC4;border-color:var(--line)}
   letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
 .saved{font-size:11.5px;color:var(--low);opacity:0;transition:opacity .3s}
 .saved.show{opacity:1}
+
+/* ===== Dark-theme overrides for components with hard-coded light colours ===== */
+body{background:radial-gradient(1200px 620px at 50% -240px,#1b2433,var(--bg)) no-repeat fixed,var(--bg)}
+.brand-mark{box-shadow:0 0 24px -6px rgba(124,156,255,.5)}
+.btn.primary{color:#0E1116}
+/* native dropdown option lists need a dark backdrop */
+select option,select.assess option{background:var(--surface);color:var(--ink)}
+/* heat-map score text + risk dots */
+.cellh{color:rgba(255,255,255,.6)}
+.cellh .dot{background:#E7ECF3;box-shadow:0 0 0 1.5px var(--surface)}
+/* Implementation / Effectiveness selects (Controls tab + Risk Register) */
+select.imp-Implemented,select.ef-Effective{background:rgba(74,222,154,.16);color:#5FE3A8;border-color:rgba(74,222,154,.4)}
+select.imp-PartiallyImplemented,select.ef-PartiallyEffective{background:rgba(242,212,92,.16);color:#F2D45C;border-color:rgba(242,212,92,.4)}
+select.imp-Planned{background:rgba(245,184,73,.16);color:#F5B849;border-color:rgba(245,184,73,.4)}
+select.imp-NotImplemented,select.ef-Ineffective{background:rgba(255,122,122,.16);color:#FF8A8A;border-color:rgba(255,122,122,.4)}
+select.ef-NotTested{background:transparent;color:var(--brand);border-color:var(--line)}
+/* Risk–Control Matrix X cells */
+.mtx td.x-Effective{background:rgba(74,222,154,.18);color:#5FE3A8}
+.mtx td.x-PartiallyEffective{background:rgba(242,212,92,.18);color:#F2D45C}
+.mtx td.x-Ineffective{background:rgba(255,122,122,.18);color:#FF8A8A}
+.mtx td.x-NotTested{background:transparent;color:var(--brand)}
+.mtx tbody tr:hover td.risklbl,.mtx tbody tr:hover td.rname-cell{background:var(--surface-2)}
+/* Dashboard "Controls by Effectiveness" chips */
+.effgrp .chip.Effective{background:rgba(74,222,154,.16);color:#5FE3A8;border-color:rgba(74,222,154,.4)}
+.effgrp .chip.PartiallyEffective{background:rgba(242,212,92,.16);color:#F2D45C;border-color:rgba(242,212,92,.4)}
+.effgrp .chip.Ineffective{background:rgba(255,122,122,.16);color:#FF8A8A;border-color:rgba(255,122,122,.4)}
+.effgrp .chip.NotTested{background:transparent;color:var(--brand);border-color:var(--line)}
+/* control-row highlight when opened from a Dashboard chip */
+@keyframes rowflash{0%,40%{background:rgba(124,156,255,.22)}100%{background:transparent}}
 </style>
 </head>
 <body>
